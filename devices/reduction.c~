@@ -67,7 +67,7 @@ index2plain(unsigned long long index, char *plain)
 static int 
 reduction_length(unsigned long long index){
 	int i;
-	for( i = key_space.key_length - 2 ; i >= 0 ; i--){
+	for( i = keyspace.key_length - 2 ; i >= 0 ; i--){
 		if(index >= key_space.subspaces[i])
 			return i+2;
 	}

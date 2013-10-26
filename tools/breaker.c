@@ -21,28 +21,30 @@ sem_t  sem3;  /* Semaforo 3 */
 
 static int nchilds;
 
+static unsigned int hashes;
+static unsigned int cracks;
+
 unsigned int chain_length;
 int num_tables;
 
 FILE *fhashesp;
-
-static unsigned int hashes = 0;
-static unsigned int cracks = 0 ;
 static Mmp_Hash tables[MAX_TABLES];
 
-void break_down_start(char *location, int threads);
-void load_hashes_file(char *file);
-void load_rainbow_tables(char *dir);
-static void search_word(SHA1Context *searchedSha, unsigned long initWord, unsigned int max_ite, int table, char *r);
-static int find_collision(SHA1Context *searchedSha, int table);
+
+
+static void break_down_start(char *dir, int threads);
+static void load_hashes_file(char *file);
+static void load_rainbow_tables(char *dir);
+static void search_sha(SHA1Context *searchedSha, unsigned long initWord, unsigned int max_ite, int table, char *r);
+static int lookup(SHA1Context *searchedSha, int table);
 static pthread_t newproc(void *(*tmain)(void *), void *args);
 static void *child(void *v);
 
 
 
 
-void 
-break_down_start(char *location, int threads){
+static void 
+break_down_start(char *dir, int threads){
 
 	if(sem_init(&sem, 0, 1) == -1){
 		perror( "can't init the semaphore" );
@@ -57,49 +59,52 @@ break_down_start(char *location, int threads){
 		exit(EXIT_FAILURE);
 	}
 
+	nchilds = threads;
+
+	hashes = 0;
+	cracks = 0 ;
+
 	int k_length;
 	char tag[5];
 	char str[80];
-	char * pch;
+	char *pch;
 
-	strcpy(str,location);
+	strcpy(str,dir);
   
   	pch = strtok (str, DELIMITER1);
 	
   	pch = strtok (NULL, DELIMITER1);
 	k_length = atoi(pch);
-	printf("%d\n",k_length);
+
 	pch = strtok (NULL, DELIMITER1);
 	strcpy(tag,pch);
 
 	pch = strtok (NULL, DELIMITER1);
-	chain_length = atoi(pch);
+	chain_length = atoi(pch);		// init chain_length
 
 	pch = strtok (NULL, DELIMITER2);
-	num_tables = atoi(pch);
-
-	nchilds = threads;
+	num_tables = atoi(pch);			// init num_tables
 
 	reduction_init(k_length,tag);
 }
 
 
 //rt_keylenth_keydomain_chainlength_tables/1
-void 
+static void 
 load_rainbow_tables(char *dir){
-	char str[80];
-	char nt[3];
+	char loc[80];
+	char table[3];
 
 	int i;
 	for(i = 0 ; i < num_tables ; i++){
-		strcpy(str,dir);
-		itoa(i,nt);
-		strcat(str,nt);
-		init_hash_table3(&tables[i], str);	
+		strcpy(loc,dir);
+		itoa(i,table);
+		strcat(loc,table);
+		init_hash_table3(&tables[i], loc);	
 	}
 }
 
-void 
+static void 
 load_hashes_file(char *file){
 
 	fhashesp = fopen(file,"r");
@@ -110,11 +115,11 @@ load_hashes_file(char *file){
 }
 
 void
-break_down(char *location, char *hashes_file, int threads){
+break_down(char *dir, char *hashes_file, int threads){
 	
-	break_down_start(location, threads);
+	break_down_start(dir, threads);
 
-	load_rainbow_tables(location);
+	load_rainbow_tables(dir);
 	load_hashes_file(hashes_file);
 
 	pthread_t  *childs;
@@ -146,8 +151,8 @@ break_down(char *location, char *hashes_file, int threads){
 
 
 
-int
-find_collision(SHA1Context *searchedSha, int t){
+static int
+lookup(SHA1Context *searchedSha, int t){
 	
 	SHA1Context sha;
 	char r[MAX_KEY_LENGTH+1];	
@@ -176,10 +181,10 @@ find_collision(SHA1Context *searchedSha, int t){
 			index = sha2index(&sha,k,t);
 		}
 		
-		i_index = get3(&tables[t],index);
+		i_index = get3(&tables[t],index);		
 
-		if(i_index){
-			search_word(searchedSha,i_index,i,t,plain_result);
+		if(i_index){							// case find collision
+			search_sha(searchedSha,i_index,i,t,plain_result);
 			if(strcmp(plain_result,"")!=0){
 				printf("%s\n",plain_result);
 				return 1;
@@ -193,8 +198,8 @@ find_collision(SHA1Context *searchedSha, int t){
 
 
 
-void
-search_word(SHA1Context *searchedSha, unsigned long initWord, unsigned int max_ite, int table, char *r){
+static void
+search_sha(SHA1Context *searchedSha, unsigned long initWord, unsigned int max_ite, int table, char *r){
 	
 	SHA1Context sha;	
 
@@ -221,7 +226,7 @@ search_word(SHA1Context *searchedSha, unsigned long initWord, unsigned int max_i
 
 
 
-void *
+static void *
 child(void *v)
 {
 	
@@ -240,7 +245,7 @@ child(void *v)
 
 		for(j = 0 ; j < num_tables ; j++){
 
-			found = find_collision(&sha, j);
+			found = lookup(&sha, j);
 			if(found){
 				sem_wait(&sem3);	// down()
 				cracks++;
@@ -260,7 +265,7 @@ child(void *v)
 	pthread_exit(0);
 }
 
-pthread_t
+static pthread_t
 newproc(void *(*tmain)(void *), void *args)
 {
 	pthread_t thread;

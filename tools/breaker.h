@@ -8,4 +8,4 @@
 #define DELIMITER2 "/"
 
 
-void break_down(char *location, char *hashes_file, int threads);
+void break_down(char *dir, char *hashes_file, int threads);

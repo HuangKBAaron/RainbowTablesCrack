@@ -1,9 +1,5 @@
-#define MAY_DEFAULT 0
-#define MIN_DEFAULT 1
-#define NUMBER_DEFAULT 0
-
-
 #define DOM_MAX 100		/* Maximum domain cardinality. */
+
 
 
 

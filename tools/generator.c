@@ -40,7 +40,7 @@ static void generate_start(int k_length, char *d_tag, unsigned int t_length, uns
 static void name_directory(int key_length, char *domain_tag, unsigned int ch_length, int tables);
 static void name_table(char *name, int table);
 static unsigned int generate_table(int n_table);
-static unsigned long long wordProcedure(unsigned long long indexInicial, int tabla);
+static unsigned long long generate_chain(unsigned long long indexInicial, int tabla);
 static pthread_t newproc(void *(*tmain)(void *), void *args);
 static void *child(void *v);
 
@@ -157,7 +157,7 @@ generate_table(int n_table)
 }
 
 static unsigned long long
-wordProcedure(unsigned long long indexInicial, int tabla)
+generate_chain(unsigned long long indexInicial, int tabla)
 {
 	char r[MAX_KEY_LENGTH+1];
 	SHA1Context h;
@@ -197,7 +197,7 @@ child(void *v)
 			index_0 = i_index ;
 		sem_post(&sem2);	// up()
 
-		index_f = wordProcedure(index_0,num_table);
+		index_f = generate_chain(index_0,num_table);
 
 		sem_wait(&sem);	// down()
 			if(get3(&hash_table,index_f)){

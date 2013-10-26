@@ -12,7 +12,7 @@ static void reverse(char *s);
 
 
 void
-string2sha(char *string,SHA1Context *sha){
+string2sha(char *string, SHA1Context *sha){
 
 	char sha_text1[9];
 	char sha_text2[9];
@@ -48,7 +48,7 @@ string2sha(char *string,SHA1Context *sha){
 }
 
 void
-shacopy(SHA1Context *sha1,SHA1Context *sha2){
+shacopy(SHA1Context *sha1, SHA1Context *sha2){
 	
 	SHA1Reset(sha2);
 
@@ -64,7 +64,7 @@ int
 shacmp(SHA1Context *sha1, SHA1Context *sha2){
 
 	int i;	
-	for(i=0 ; i<5 ; i++){
+	for(i = 0 ; i < 5 ; i++){
 		if(sha1->Message_Digest[i] != sha2->Message_Digest[i])	
 			return 1;
 	}
