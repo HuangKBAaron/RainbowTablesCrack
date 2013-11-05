@@ -6,14 +6,11 @@
 #include "../lib/domain.h"
 
 
-
 static struct space key_space;
 static struct domain key_domain;	
 
 
-
 static int reduction_length(unsigned long long index);
-static unsigned long long relative_index(unsigned long long index, int size);
 
 
 
@@ -26,8 +23,8 @@ reduction_init(int k_length, char *tag){
 
 
 
-/*reduction function: a different function for each column*/
-/*transform a sha into a word*/
+/* reduction function: a different function for each column */
+/* transform a sha into a plaintext */
 void
 sha2plain(struct SHA1Context *sha, int offset, int table, char *plain)
 {
@@ -47,7 +44,7 @@ sha2index(struct SHA1Context *sha, int offset, int table)
 }
 
 
-/*each word is represented by a index*/
+/* transform a index into a plaintext */
 void
 index2plain(unsigned long long index, char *plain)
 {

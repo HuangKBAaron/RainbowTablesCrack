@@ -6,23 +6,23 @@
 #include "../tools/generator.h"
 
 
-#define PARS 12
-#define PAR1 "-l"
-#define PAR2 "-cl"
-#define PAR3 "-t"
-#define PAR4 "-tl"
-#define PAR5 "-ths"
+const int PARS = 12;
+const char PAR1[3] = "-l";
+const char PAR2[4] = "-cl";
+const char PAR3[3] = "-t";
+const char PAR4[4] = "-tl";
+const char PAR5[5] = "-ths";
 
-#define DOM1 "-a"
-#define DOM2 "-A"
-#define DOM3 "-0"
-#define DOM4 "-aA"
-#define DOM5 "-a0"
-#define DOM6 "-A0"
-#define DOM7 "-aA0"
+const char DOM1[3] = "-a";
+const char DOM2[3] = "-A";
+const char DOM3[3] = "-0";
+const char DOM4[4] = "-aA";
+const char DOM5[4] = "-a0";
+const char DOM6[4] = "-A0";
+const char DOM7[5] = "-aA0";
 
 
-// ./generate -l 6 -a -cl 1000 -t 4 -tl 10000 -ths 4
+// ./generate -l 6 -a -cl 1000 -t 4 -tl 10000 -ths 8
 
 /*
 Longitud: 6

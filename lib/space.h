@@ -1,4 +1,4 @@
-#define MAX_KEY_LENGTH 14		/* Highest key length. */
+enum{ MAX_KEY_LENGTH = 14};		/* Highest key length. */
 
 
 

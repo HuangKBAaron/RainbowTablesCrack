@@ -1,8 +1,3 @@
-#define PERMS 0660
-
-
-
-
 /* Entry structure for key-value storage */
 typedef struct {
 	unsigned long long key;

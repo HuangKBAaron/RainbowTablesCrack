@@ -8,9 +8,6 @@
 static void reverse(char *s);
 
 
-
-
-
 void
 string2sha(char *string, SHA1Context *sha){
 
@@ -60,6 +57,7 @@ shacopy(SHA1Context *sha1, SHA1Context *sha2){
 
 }
 
+/* shacmp adapted to our test with salts */
 int 
 shacmp(SHA1Context *sha1, SHA1Context *sha2){
 

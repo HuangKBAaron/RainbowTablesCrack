@@ -5,6 +5,7 @@
 #include <semaphore.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include "../devices/sha1.h"
 #include "../devices/reduction.h"
@@ -12,6 +13,15 @@
 #include "../lib/hashTable3.h"
 #include "../lib/space.h"
 #include "breaker.h"
+
+
+const char TABLE_RUTE[12] = "../storage/";
+
+const char DELIMITER1[2] = "_";
+const char DELIMITER2[2] = "/";
+
+enum{ MAX_TABLES = 10};
+
 
 
 sem_t  sem;  /* Semaforo */
@@ -29,6 +39,7 @@ int num_tables;
 
 FILE *fhashesp;
 static Mmp_Hash tables[MAX_TABLES];
+
 
 
 
@@ -107,7 +118,7 @@ load_rainbow_tables(char *dir){
 static void 
 load_hashes_file(char *file){
 
-	fhashesp = fopen(file,"r");
+	fhashesp = open(file,O_RDONLY,0777);
 
 	if(fhashesp == NULL){
 		printf("Eror al leer el archivo.\n");
@@ -146,7 +157,7 @@ break_down(char *dir, char *hashes_file, int threads){
 		close_hash_table3(&tables[i]);		
 	}
 
-	fclose(fhashesp);		
+	close(fhashesp);		
 }
 
 
@@ -214,13 +225,12 @@ search_sha(SHA1Context *searchedSha, unsigned long initWord, unsigned int max_it
 		if (!SHA1Result(&sha)){
         		printf("ERROR-- could not compute message digest\n");
 			break;
-    		}else{
-			if(shacmp(searchedSha,&sha) == 0){
-				//printf("iteracion: %d max_ite: %u\n",j,max_ite);
-				return ;	
-			}
-		}
+    		}
 	}
+	if(shacmp(searchedSha,&sha) == 0){
+		return ;	
+	}
+
 	r[0]='\0';
 }
 
@@ -237,7 +247,7 @@ child(void *v)
 	int j, i ;
 	sem_wait(&sem);	// down()
 
-	for(i = 0 ; fscanf(fhashesp,"%s",sha_text) != EOF ; i++){
+	for(i = 0 ; read(fhashesp,sha_text,sizeof(sha_text)) ; i++){
 		hashes++;
 		sem_post(&sem);	// up()
 

@@ -3,8 +3,6 @@
 #include "space.h"
 
 
-
-
 void
 calculate_keyspace(struct space *key_space, int dom_length, int k_length){
 

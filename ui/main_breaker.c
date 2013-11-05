@@ -5,7 +5,7 @@
 #include <string.h>
 #include "../tools/breaker.h" 
 
-#define PARS 4
+const int PARS = 4;
 
 // ./break storage/rt_6_a_1000_5/ tests/hashes 4
 

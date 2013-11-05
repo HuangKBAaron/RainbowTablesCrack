@@ -1,7 +1,3 @@
-#define PERMS 0666
-
-#define TABLE_SIZE 4294967291		// Espacio reservado en disco 
-
 /* Hash table structure for secondary storage */
 typedef struct {
 	int fd;

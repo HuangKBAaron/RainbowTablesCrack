@@ -1,6 +1,4 @@
-#define DOM_MAX 100		/* Maximum domain cardinality. */
-
-
+enum {DOM_MAX = 100};		/* Maximum domain cardinality. */
 
 
 
@@ -11,8 +9,4 @@ struct domain {
 
 
 
-
 void set_key_domain(struct domain *k_domain, char *tag);
-
-
-

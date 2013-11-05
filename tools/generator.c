@@ -33,6 +33,7 @@ static Mmp_Hash hash_table;
 sem_t  sem;  /* Semaforo */
 sem_t  sem2;  /* Semaforo 2 */
 
+const char TABLE_PATH[9] = "storage/";
 
 
 static void init_table_generator(int t);
@@ -84,7 +85,7 @@ name_directory(int key_length, char *domain_tag, unsigned int ch_length, int tab
 	itoa(tables,nt);
 
 	directory[0] = '\0';
-	strcat(directory,TABLE_RUTE);
+	strcat(directory,TABLE_PATH);
 	strcat(directory,"rt");
 	strcat(directory,"_");
 	strcat(directory,kl);

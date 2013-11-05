@@ -11,12 +11,13 @@
 #include <sys/mman.h>
 #include "hashTable3.h"
 
+enum { PERMS = 0660 };
 
-static unsigned long prime = 179424673;	
-static unsigned long scale = 7;
-static unsigned long shift = 13;
-static unsigned long capacity = 179424673;	
-static unsigned long q = 997;			// q prime and lower tha capacity
+const unsigned long prime = 179424673;	
+const unsigned long scale = 7;
+const unsigned long shift = 13;
+const unsigned long capacity = 179424673;	
+const unsigned long q = 997;			// q prime and lower tha capacity
 
 
 
@@ -103,7 +104,6 @@ void create_hash_table3(Mmp_Hash *h, char *table_name){
 	}
 
 }
-
 
 void init_hash_table3(Mmp_Hash *h, char *table_name){
 
