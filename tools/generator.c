@@ -7,9 +7,9 @@
 #include <pthread.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <openssl/sha.h>
 #include "generator.h"
 #include "../devices/reduction.h"
-#include "../devices/sha1.h"
 #include "../lib/hashTable3.h"
 #include "../lib/spclib.h"
 #include "../lib/space.h"
@@ -161,23 +161,16 @@ static unsigned long long
 generate_chain(unsigned long long indexInicial, int tabla)
 {
 	char r[MAX_KEY_LENGTH+1];
-	SHA1Context h;
+	unsigned char sha[20];
 
 	unsigned long long index;
 	index = indexInicial;
 
 	int i;
 	for(i = 0; i < chain_length ; i++){
-
 		index2plain(index,r);
-
-		SHA1Reset(&h);
-    		SHA1Input(&h, (const unsigned char *) r, strlen(r));
-		if (!SHA1Result(&h)){
-        		printf("ERROR-- could not compute message digest\n");
-			break;
-    		}
-		index = sha2index(&h, i, tabla);
+                SHA1(r, strlen(r), sha);	
+		index = sha2index(sha, i, tabla);
 	}
 
 	return index;

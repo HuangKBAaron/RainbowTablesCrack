@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdio.h>
+#include <openssl/sha.h>
 #include "reduction.h"
-#include "sha1.h"
 #include "../lib/space.h"
 #include "../lib/domain.h"
 
@@ -26,9 +26,9 @@ reduction_init(int k_length, char *tag){
 /* reduction function: a different function for each column */
 /* transform a sha into a plaintext */
 void
-sha2plain(struct SHA1Context *sha, int offset, int table, char *plain)
+sha2plain(unsigned char *sha, int offset, int table, char *plain)
 {
-	unsigned long long *pUll = &(sha-> Message_Digest[3]);
+	unsigned long long *pUll = &(sha[12]);
 
 	index2plain( (*pUll + offset + table) % key_space.ks, plain);		
 }
@@ -36,9 +36,9 @@ sha2plain(struct SHA1Context *sha, int offset, int table, char *plain)
 
 /*transform a sha into a index*/
 unsigned long long
-sha2index(struct SHA1Context *sha, int offset, int table)
+sha2index(unsigned char *sha, int offset, int table)
 {
-	unsigned long long *pUll = &(sha-> Message_Digest[3]);
+	unsigned long long *pUll = &(sha[12]);
 
 	return ( *pUll + offset + table) % key_space.ks;		
 }

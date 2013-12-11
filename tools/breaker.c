@@ -7,7 +7,7 @@
 #include <pthread.h>
 #include <fcntl.h>
 #include <sys/types.h>
-#include "../devices/sha1.h"
+#include <openssl/sha.h>
 #include "../devices/reduction.h"
 #include "../lib/spclib.h"
 #include "../lib/hashTable3.h"
@@ -46,8 +46,8 @@ static Mmp_Hash tables[MAX_TABLES];
 static void break_down_start(char *dir, int threads);
 static void load_hashes_file(char *file);
 static void load_rainbow_tables(char *dir);
-static void search_sha(SHA1Context *searchedSha, unsigned long initWord, unsigned int max_ite, int table, char *r);
-static int lookup(SHA1Context *searchedSha, int table);
+static void search_sha(unsigned char *searchedSha, unsigned long initWord, unsigned int max_ite, int table, char *r);
+static int lookup(unsigned char *searchedSha, int table);
 static pthread_t newproc(void *(*tmain)(void *), void *args);
 static void *child(void *v);
 
@@ -163,9 +163,9 @@ break_down(char *dir, char *hashes_file, int threads){
 
 
 static int
-lookup(SHA1Context *searchedSha, int t){
+lookup(unsigned char *searchedSha, int t){
 	
-	SHA1Context sha;
+	unsigned char sha[20];
 	char r[MAX_KEY_LENGTH+1];	
 	char plain_result[MAX_KEY_LENGTH+1];
 	unsigned long long index;
@@ -175,26 +175,18 @@ lookup(SHA1Context *searchedSha, int t){
 	int i;
 	for(i = chain_length-1; i >= 0 ; i--){	
 
-		shacopy(searchedSha,&sha);
-		index = sha2index(&sha,i,t);
+		//strcpy(searchedSha,sha);
+		index = sha2index(sha,i,t);
 
-		for(k= i+1; k < chain_length ; k++){
-						
+		for(k= i+1; k < chain_length ; k++){					
 			index2plain(index,r);
-
-			SHA1Reset(&sha);
-    			SHA1Input(&sha, (const unsigned char *) r, strlen(r));
-			if (!SHA1Result(&sha)){
-        			printf("ERROR-- could not compute message digest\n");
-				break;
-    			}
-
-			index = sha2index(&sha,k,t);
+			SHA1(r, strlen(r), sha);
+			index = sha2index(sha,k,t);
 		}
 		
 		i_index = get3(&tables[t],index);		
 
-		if(i_index){							// case find collision
+		if(i_index){			// case find collision
 			search_sha(searchedSha,i_index,i,t,plain_result);
 			if(strcmp(plain_result,"")!=0){
 				printf("%s\n",plain_result);
@@ -210,24 +202,18 @@ lookup(SHA1Context *searchedSha, int t){
 
 
 static void
-search_sha(SHA1Context *searchedSha, unsigned long initWord, unsigned int max_ite, int table, char *r){
+search_sha(unsigned char *searchedSha, unsigned long initWord, unsigned int max_ite, int table, char *r){
 	
-	SHA1Context sha;	
+	unsigned char sha[20];	
 
 	unsigned long long index = initWord;
 	index2plain(index,r);
 
 	int j;
-	for(j = 0; j <= max_ite ; sha2plain(&sha,j,table,r),j++){
-
-		SHA1Reset(&sha);
-    		SHA1Input(&sha, (const unsigned char *) r, strlen(r));
-		if (!SHA1Result(&sha)){
-        		printf("ERROR-- could not compute message digest\n");
-			break;
-    		}
+	for(j = 0; j <= max_ite ; sha2plain(sha,j,table,r),j++){
+		SHA1(r, strlen(r), sha);
 	}
-	if(shacmp(searchedSha,&sha) == 0){
+	if(strcmp(searchedSha,sha) == 0){
 		return ;	
 	}
 
@@ -235,14 +221,23 @@ search_sha(SHA1Context *searchedSha, unsigned long initWord, unsigned int max_it
 }
 
 
+void string2sha(char *str, unsigned char *sha){
+	unsigned char hex[3];
+	int i;
+	for(i=0 ; i < 20 ; i++){
+		strncpy(hex,&str[i*2],2);	
+		sscanf(hex,"%x",&sha[i]);
+	}
+}
+
+
 
 static void *
 child(void *v)
 {
-	
 	int found;
 	char sha_text[41];
-	struct SHA1Context sha; 
+	unsigned char sha[20];
 
 	int j, i ;
 	sem_wait(&sem);	// down()
@@ -251,7 +246,7 @@ child(void *v)
 		hashes++;
 		sem_post(&sem);	// up()
 
-		string2sha(sha_text,&sha);
+		string2sha(sha_text,sha);
 
 		for(j = 0 ; j < num_tables ; j++){
 

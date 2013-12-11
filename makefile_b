@@ -2,19 +2,18 @@
 # uso de variables; reglas predefinidas
 
 CC = gcc -pthread
-OBJECTS = devices/sha1.o devices/reduction.o lib/spclib.o lib/hashTable3.o lib/domain.o lib/space.o tools/breaker.o
+OBJECTS = devices/reduction.o lib/spclib.o lib/hashTable3.o lib/domain.o lib/space.o tools/breaker.o
 
 break : ui/main_breaker.o $(OBJECTS)
-	$(CC) -o break ui/main_breaker.o $(OBJECTS) -lm
+	$(CC) -o break ui/main_breaker.o $(OBJECTS) -lm -lssl -lcrypto
 
 ui/main_breaker.o: tools/breaker.h
 lib/hashTable3.o: lib/hashTable3.h
 lib/domain.o: lib/domain.h
 lib/space.o: lib/space.h 
-devices/sha1.o: devices/sha1.h
-lib/spclib.o: lib/spclib.h devices/sha1.h
-devices/reduction.o: devices/reduction.h devices/sha1.h lib/space.h lib/domain.h lib/space.h
-tools/breaker.o: tools/breaker.h devices/reduction.h devices/sha1.h lib/spclib.h lib/hashTable3.h lib/space.h
+lib/spclib.o: lib/spclib.h
+devices/reduction.o: devices/reduction.h lib/space.h lib/domain.h lib/space.h
+tools/breaker.o: tools/breaker.h devices/reduction.h lib/spclib.h lib/hashTable3.h lib/space.h
 
 
 
