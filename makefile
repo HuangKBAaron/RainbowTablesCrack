@@ -5,7 +5,7 @@ CC = gcc -pthread
 OBJECTS = devices/reduction.o lib/hashTable3.o lib/spclib.o lib/domain.o lib/space.o tools/generator.o 
 
 generate : ui/main_generator.o $(OBJECTS)
-	$(CC) -o generate ui/main_generator.o $(OBJECTS) -lm -lssl -lcrypto
+	$(CC) -o generate ui/main_generator.o $(OBJECTS) -lm -lcrypto
 
 ui/main_generator.o: tools/generator.h 
 lib/hashTable3.o: lib/hashTable3.h

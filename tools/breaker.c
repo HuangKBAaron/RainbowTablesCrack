@@ -175,7 +175,7 @@ lookup(unsigned char *searchedSha, int t){
 	int i;
 	for(i = chain_length-1; i >= 0 ; i--){	
 
-		//strcpy(searchedSha,sha);
+		strcpy(sha, searchedSha);
 		index = sha2index(sha,i,t);
 
 		for(k= i+1; k < chain_length ; k++){					
@@ -199,7 +199,15 @@ lookup(unsigned char *searchedSha, int t){
 }
 
 
-
+int SHAcmp(unsigned char*sha_1, unsigned char *sha_2){
+	int i;
+	for(i = 0 ; i < 20 ; i++){
+		if(sha_1[i] != sha_2[i]){
+			return i+1;
+		}
+	}
+	return 0;
+}
 
 static void
 search_sha(unsigned char *searchedSha, unsigned long initWord, unsigned int max_ite, int table, char *r){
@@ -210,10 +218,11 @@ search_sha(unsigned char *searchedSha, unsigned long initWord, unsigned int max_
 	index2plain(index,r);
 
 	int j;
-	for(j = 0; j <= max_ite ; sha2plain(sha,j,table,r),j++){
+	for(j = 0; j < max_ite ; sha2plain(sha,j,table,r),j++){
 		SHA1(r, strlen(r), sha);
 	}
-	if(strcmp(searchedSha,sha) == 0){
+	SHA1(r, strlen(r), sha);
+	if(SHAcmp(searchedSha,sha) == 0){
 		return ;	
 	}
 
@@ -250,7 +259,7 @@ child(void *v)
 
 		for(j = 0 ; j < num_tables ; j++){
 
-			found = lookup(&sha, j);
+			found = lookup(sha, j);
 			if(found){
 				sem_wait(&sem3);	// down()
 				cracks++;
