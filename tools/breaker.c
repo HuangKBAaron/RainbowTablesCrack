@@ -160,7 +160,12 @@ break_down(char *dir, char *hashes_file, int threads){
 	close(fhashesp);		
 }
 
-
+void SHAcpy(unsigned char*sha_1, unsigned char *sha_2){
+	int i;
+	for(i = 0 ; i < 20 ; i++){
+		sha_1[i] = sha_2[i];
+	}
+}
 
 static int
 lookup(unsigned char *searchedSha, int t){
@@ -175,7 +180,7 @@ lookup(unsigned char *searchedSha, int t){
 	int i;
 	for(i = chain_length-1; i >= 0 ; i--){	
 
-		strcpy(sha, searchedSha);
+		SHAcpy(sha, searchedSha);
 		index = sha2index(sha,i,t);
 
 		for(k= i+1; k < chain_length ; k++){					
@@ -201,7 +206,7 @@ lookup(unsigned char *searchedSha, int t){
 
 int SHAcmp(unsigned char*sha_1, unsigned char *sha_2){
 	int i;
-	for(i = 0 ; i < 20 ; i++){
+	for(i = 3 ; i < 20 ; i++){
 		if(sha_1[i] != sha_2[i]){
 			return i+1;
 		}
