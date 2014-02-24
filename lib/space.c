@@ -15,7 +15,7 @@ calculate_keyspace(struct space *key_space, int dom_length, int k_length){
 	}
 	key_space->key_length = k_length;
 
-	printf("%llu\n",key_space->ks);	
+	//printf("keyspace: %llu\n",key_space->ks);	
 }
 
 

@@ -194,7 +194,14 @@ lookup(unsigned char *searchedSha, int t){
 		if(i_index){			// case find collision
 			search_sha(searchedSha,i_index,i,t,plain_result);
 			if(strcmp(plain_result,"")!=0){
+				sem_wait(&sem2);	// up()
+				int i;
+				for(i=0 ; i < 20 ; i++){
+					printf("%02x",searchedSha[i]);
+				}
+				printf(" -> ");
 				printf("%s\n",plain_result);
+				sem_post(&sem2);	// up()
 				return 1;
 			}				
 		}
@@ -274,7 +281,9 @@ child(void *v)
 			}
 		}
 		if(!found){
-			//printf("clave %d no encontrada\n", i);	
+			sem_wait(&sem2);	// down()
+			printf("not found\n");	
+			sem_post(&sem2);	// up()
 		}
 
 		sem_wait(&sem);	// down()	

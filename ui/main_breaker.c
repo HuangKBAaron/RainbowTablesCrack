@@ -26,7 +26,7 @@ char *argv[];
 	strcpy(hfile,argv[2]);
 	thrds = atoi(argv[3]);
 
-	printf("location: %s\n",loc);
+	printf("rainbow table: %s\n",loc);
 	printf("hash file: %s\n",hfile);
 	printf("threads: %d\n",thrds);
 
