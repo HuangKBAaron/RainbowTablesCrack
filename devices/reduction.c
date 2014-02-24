@@ -61,6 +61,25 @@ index2plain(unsigned long long index, char *plain)
 	plain[j] = '\0';
 }
 
+/* transform a index into a plaintext optimized 64 bits */
+void
+index2plain_64(unsigned long long index, char *plain)
+{
+	int rlength = reduction_length(index);
+
+	unsigned long long ind = index;
+
+	int j, k;
+	for( j = 0 ; j < rlength ; j++ ){
+		k = ind & 0x3F;
+//printf("- %d -\n",k);
+		plain[j] = key_domain.elements[k];
+		ind = ind >> 6;
+	}
+
+	plain[j] = '\0';
+}
+
 static int 
 reduction_length(unsigned long long index){
 	int i;
@@ -68,7 +87,7 @@ reduction_length(unsigned long long index){
 		if(index >= key_space.subspaces[i])
 			return i+2;
 	}
-	return 0;
+	return 1;
 }
 
 

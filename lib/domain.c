@@ -31,6 +31,14 @@ set_key_domain(struct domain *k_domain, char *tag){
 			k_domain->length++;
 		}
 	}
+	pch = strchr(tag,'*');
+	if(pch != NULL){
+		k_domain->elements[k_domain->length]= '.';
+		k_domain->length++;
+
+		k_domain->elements[k_domain->length]= '_';
+		k_domain->length++;
+	}
 }
 
 
