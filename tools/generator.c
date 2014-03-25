@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <openssl/sha.h>
+
 #include "generator.h"
 #include "../devices/reduction.h"
 #include "../lib/hashTable3.h"
@@ -15,17 +16,20 @@
 #include "../lib/space.h"
 
 
-unsigned int table_length;
-unsigned int chain_length;
+const unsigned int THREADS_NUMBER = 8;
+const char *RB_TABLES_PATH = "storage/";
 
-char directory[80];
+static const char *directory;
 
-static int nchilds;
 
-static unsigned long long coll ;
-static unsigned int chains ;
+static unsigned int table_length;
+static unsigned int chain_length;
+static unsigned int ntables;
+
+static unsigned long long collisions;
+static unsigned int chains;
 static unsigned int i_index;
-static int num_table ;
+static unsigned int num_table;			// global var
 
 static Mmp_Hash hash_table;
 
@@ -33,12 +37,11 @@ static Mmp_Hash hash_table;
 sem_t  sem;  /* Semaforo */
 sem_t  sem2;  /* Semaforo 2 */
 
-const char TABLE_PATH[9] = "storage/";
+
 
 
 static void init_table_generator(int t);
-static void generate_start(int k_length, char *d_tag, unsigned int t_length, unsigned int ch_length, int tables, int threads);
-static void name_directory(int key_length, char *domain_tag, unsigned int ch_length, int tables);
+static const char *name_directory(int key_length, char *domain_tag, unsigned int ch_length, int tables);
 static void name_table(char *name, int table);
 static unsigned int generate_table(int n_table);
 static unsigned long long generate_chain(unsigned long long indexInicial, int tabla);
@@ -48,8 +51,8 @@ static void *child(void *v);
 
 
 
-static void 
-generate_start(int k_length, char *d_tag, unsigned int t_length, unsigned int ch_length, int tables, int threads){
+void 
+init_table_generator(unsigned int k_length, char *cs_tag, unsigned int t_length, unsigned int ch_length, unsigned int tables){
 
 	if(sem_init(&sem, 0, 1) == -1){
 		perror( "can't init the semaphore" );
@@ -61,33 +64,34 @@ generate_start(int k_length, char *d_tag, unsigned int t_length, unsigned int ch
 		exit(EXIT_FAILURE);
 	}
 
-	table_length = t_length;
-	chain_length = ch_length;
+	init_reduction(k_length, d_tag);
 
-	nchilds = threads ;
-
-	reduction_init(k_length, d_tag);
-	name_directory(k_length, d_tag, ch_length, tables);
+	directory = name_directory(k_length, cs_tag, ch_length, tables);
 
 	i_index = 0;
-	coll = 0 ;
+	collisions = 0 ;
+
+	table_length = t_length;
+	chain_length = ch_length;
+	ntables = tables;
 
 }
 
-static void 
-name_directory(int key_length, char *domain_tag, unsigned int ch_length, int tables){
+static const char * 
+name_directory(int key_length, char *charset_tag, unsigned int chain_length, int tables){
+
 	char kl[3];
 	char cl[3];
 	char nt[3];
 
 	itoa(key_length,kl);
-	itoa(ch_length,cl);
+	itoa(chain_length,cl);
 	itoa(tables,nt);
 
 	directory[0] = '\0';
-	strcat(directory,TABLE_PATH);
-	strcat(directory,"rt");
-	strcat(directory,"_");
+	strncat(directory,TABLE_PATH);
+	strncat(directory,"rt");
+	strncat(directory,"_");
 	strcat(directory,kl);
 	strcat(directory,"_");
 	strcat(directory,domain_tag);
@@ -115,50 +119,43 @@ name_table(char *name, int table){
 }
 
 
-static void
-init_table_generator(int t){
-	
-	num_table =  t;
+unsigned int 
+generate_table(unsigned int n_table)
+{
+	num_table =  n_table;
 	chains = 0 ;
 
 	char name[80];
 	name_table(name,t);
 
 	create_hash_table3(&hash_table, name);
-}
-
-
-unsigned int 
-generate_table(int n_table)
-{
-	init_table_generator(n_table);
 
 	pthread_t  *childs;
-	childs = malloc(nchilds * sizeof(pthread_t));
+	childs = malloc(THREADS_NUMBER * sizeof(pthread_t));
 
 	/*
 	 * crea todos los threads
 	 */
 	int i;
-	for(i = 0; i < nchilds ; i++){
+	for(i = 0; i < THREADS_NUMBER ; i++){
 		childs[i] = newproc(child, NULL);
 	}
 	/*
 	 * espera a que acaben todos los threads
 	 */
-	for(i= 0; i <  nchilds; i++)
+	for(i= 0; i <  THREADS_NUMBER; i++)
 		pthread_join(childs[i], NULL);
 	free(childs);
 
 	close_hash_table3(&hash_table);
 
-	printf("Colisiones: %u\n",coll);
+	printf("Colisiones: %u\n",collisions);
 
 	return i_index;	
 }
 
 static unsigned long long
-generate_chain(unsigned long long indexInicial, int tabla)
+generate_chain(unsigned long long indexInicial, unsigned int tabla)
 {
 	char r[MAX_KEY_LENGTH+1];
 	unsigned char sha[20];
@@ -195,7 +192,7 @@ child(void *v)
 
 		sem_wait(&sem);	// down()
 			if(get3(&hash_table,index_f)){
-				coll++;
+				collisions++;
 			}else{
 				put3(&hash_table,index_f,index_0);
 				chains++;
@@ -223,14 +220,11 @@ newproc(void *(*tmain)(void *), void *args)
 }
 
 
-
 void 
-generate_tables(int key_length, char *domain_tag, unsigned int t_length, unsigned int ch_length, int tables, int threads)
+generate_rainbow_tables()
 {
-	generate_start(key_length, domain_tag, t_length, ch_length, tables, threads);
-
 	int i ;
-	for(i = 0 ; i < tables ; i++){
+	for(i = 0 ; i < ntables ; i++){
 		generate_table(i);
 	}
 }
