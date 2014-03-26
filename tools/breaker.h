@@ -1,2 +1,2 @@
-
-void break_down(char *dir, char *hashes_file, int threads);
+void init_breaker(char *dir, int threads);
+void break_hash_file(char *hashes_file);
