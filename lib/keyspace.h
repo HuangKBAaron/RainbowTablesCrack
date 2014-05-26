@@ -1,18 +1,18 @@
 enum{ MAX_KEY_LENGTH = 14};		/* Highest key length. */
-enum {DOM_MAX = 100};		/* Maximum domain cardinality. */
+enum {CHARSET_MAX = 100};		/* Maximum charset cardinality. */
 
 
 
 
-struct charset {
-	char elements[DOM_MAX];
-	int length;
+struct arrayset {
+	char elements[CHARSET_MAX];
+	int size;
 };
 
 
-void init_keyspace(const char *charset_tag, unsigned int length);
-unsigned long long get_keyspace();
+void init_keyspace(const char *charset_tag, unsigned int maxkeylength);
+unsigned long long get_keyspace(void);
 unsigned long long get_subspace(unsigned int i);
-unsigned int get_keylength();
-struct charset *get_charset();
+unsigned int get_max_key_length(void);
+struct charset *get_charset(void);
 

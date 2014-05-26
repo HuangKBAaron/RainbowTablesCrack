@@ -28,6 +28,15 @@ sha2plain(unsigned char *sha, int offset, int table, char *plain)
 	index2plain( (*pUll + offset + table) % get_keyspace(), plain);		
 }
 
+/* transform a sha into a plaintext. |Charset| must be equal to 64 */
+void
+sha2plain_64(unsigned char *sha, int offset, int table, char *plain)
+{
+	unsigned long long *pUll = &(sha[12]);
+
+	index2plain_64( (*pUll + offset + table) % get_keyspace(), plain);		
+}
+
 
 /*transform a sha into a index*/
 unsigned long long
@@ -37,7 +46,6 @@ sha2index(unsigned char *sha, int offset, int table)
 
 	return ( *pUll + offset + table) % get_keyspace();		
 }
-
 
 /* transform a index into a plaintext */
 void
@@ -56,7 +64,7 @@ index2plain(unsigned long long index, char *plain)
 	plain[j] = '\0';
 }
 
-/* transform a index into a plaintext optimized 64 bits */
+/* transform a index into a plaintext. |Charset| must be equal to 64 */
 void
 index2plain_64(unsigned long long index, char *plain)
 {
@@ -67,7 +75,7 @@ index2plain_64(unsigned long long index, char *plain)
 	int j, k;
 	for( j = 0 ; j < rlength ; j++ ){
 		k = ind & 0x3F;
-//printf("- %d -\n",k);
+
 		plain[j] = get_charset()->elements[k];
 		ind = ind >> 6;
 	}
@@ -75,6 +83,8 @@ index2plain_64(unsigned long long index, char *plain)
 	plain[j] = '\0';
 }
 
+
+/* Returns the length of the word represented by the index */
 static int 
 reduction_length(unsigned long long index){
 	int i;

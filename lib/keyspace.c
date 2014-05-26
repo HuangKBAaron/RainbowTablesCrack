@@ -1,76 +1,77 @@
-#include <math.h>
+#include <stdlib.h>
 #include <stdio.h>
-#include "space.h"
-#include "charset.h"
+#include <math.h>
+#include "keyspace.h"
 
 
 
-unsigned long long key_space;					// keyspace
-unsigned long long subspaces[MAX_KEY_LENGTH];		// array of index of sizes
-
-int key_length;
-struct charset char_set;
+static unsigned long long key_space;					
+static unsigned long long subspaces[MAX_KEY_LENGTH];		// array of index of sizes
 
 
-void set_charset(struct domain *k_domain, char *tag);
+static int max_key_length;
+static struct arrayset charset;
 
 
 
-
-void init_keyspace(const char *charset_tag, unsigned int length){
-
-	key_space->ks = 0;
-
-	int i;
-	for(i = 1 ; i <= k_length ; i++){
-		key_space->ks += pow(dom_length, i); 
-		key_space->subspaces[i-1] = key_space->ks;
-	}
-	key_space->key_length = k_length;
-
-	//printf("keyspace: %llu\n",key_space->ks);
+static void init_charset(struct arrayset *charset, char *tag);
 
 
-	set_charset(tag);
-}
 
 
-void 
-set_charset(char *tag){
+static void 
+init_charset(struct arrayset *charset, char *tag){
 	char i;
 	char *pch;
 
-	k_domain->length = 0;
+	charset->size = 0;
 
 	pch = strchr(tag,'a');
 	if(pch != NULL){
 		for(i = 'a'; i <= 'z' ; i++){
-			k_domain->elements[k_domain->length] = i;
-			k_domain->length++;
+			charset->elements[charset->size] = i;
+			charset->size++;
 		}
 	}
 	pch = strchr(tag,'A');
 	if(pch != NULL){
 		for(i = 'A'; i <= 'Z' ; i++){
-			k_domain->elements[k_domain->length] = i;
-			k_domain->length++;
+			charset->elements[charset->size] = i;
+			charset->size++;
 		}
 	}
 	pch = strchr(tag,'0');
 	if(pch != NULL){
 		for(i = '0'; i <= '9' ; i++){
-			k_domain->elements[k_domain->length]= i;
-			k_domain->length++;
+			charset->elements[charset->size]= i;
+			charset->size++;
 		}
 	}
 	pch = strchr(tag,'*');
 	if(pch != NULL){
-		k_domain->elements[k_domain->length]= '.';
-		k_domain->length++;
+		charset->elements[charset->size]= '.';
+		charset->size++;
 
-		k_domain->elements[k_domain->length]= '_';
-		k_domain->length++;
+		charset->elements[charset->size]= '_';
+		charset->size++;
 	}
+}
+
+
+
+void init_keyspace(const char *charset_tag, unsigned int maxkeylength){
+
+	init_charset(charset_tag);
+
+	key_space = 0;
+
+	int i;
+	for(i = 1 ; i <= k_length ; i++){
+		key_space += pow(charset.size, i); 
+		subspaces[i-1] = key_space;
+	}
+
+	max_key_length = maxkeylength;	
 }
 
 
@@ -82,12 +83,12 @@ unsigned long long get_subspace(unsigned int i){
 	return subspaces[i];
 }
 
-unsigned int get_keylength(){
-	return key_length;
+unsigned int get_max_key_length(){
+	return max_key_length;
 }
 
 struct charset *get_charset(){
-	return &char_set;
+	return &charset;
 }
 
 
