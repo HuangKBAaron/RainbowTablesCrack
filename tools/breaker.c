@@ -9,27 +9,18 @@
 #include <sys/types.h>
 #include <openssl/sha.h>
 #include "../devices/reduction.h"
-#include "../lib/spclib.h"
+#include "../lib/util.h"
 #include "../lib/hashTable3.h"
-#include "../lib/space.h"
+#include "../lib/keyspace.h"
 #include "breaker.h"
 
 
-static const unsigned int THREADS_NUMBER = 8;
-static const char TABLE_RUTE[12] = "../storage/";
 
-static const char DELIMITER1[2] = "_";
-static const char DELIMITER2[2] = "/";
-
-enum{ MAX_TABLES = 10};
-
-static const char *DIRECTORY;
 static unsigned int CHAIN_LENGTH;
 static int TABLES_NUMBER;
 
 static unsigned int hashes;
 static unsigned int cracks;
-
 
 FILE *fhashesp;
 static Mmp_Hash tables[MAX_TABLES];
@@ -81,6 +72,9 @@ init_breaker(char *dir, int threads){
 		perror( "can't init the semaphore" );
 		exit(EXIT_FAILURE);
 	}
+
+	char DELIMITER1[2] = "_";
+	const char DELIMITER2[2] = "/";
 
 	THREADS_NUMBER = threads;
 

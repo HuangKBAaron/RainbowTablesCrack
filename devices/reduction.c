@@ -50,15 +50,15 @@ sha2index(unsigned char *sha, int offset, int table)
 /* transform a index into a plaintext */
 void
 index2plain(unsigned long long index, char *plain)
-{
+{	
 	int rlength = reduction_length(index);
 
 	unsigned long long ind = index;
 
 	int j;
 	for( j = 0 ; j < rlength ; j++ ){
-		plain[j] = get_charset()->elements[ind%get_charset()->length];
-		ind /= get_charset()->length;
+		plain[j] = get_charset()->elements[ind%get_charset()->size];
+		ind /= get_charset()->size;
 	}
 
 	plain[j] = '\0';

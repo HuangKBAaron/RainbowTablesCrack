@@ -61,12 +61,12 @@ init_charset(struct arrayset *charset, char *tag){
 
 void init_keyspace(const char *charset_tag, unsigned int maxkeylength){
 
-	init_charset(charset_tag);
+	init_charset(&charset, charset_tag);
 
 	key_space = 0;
 
 	int i;
-	for(i = 1 ; i <= k_length ; i++){
+	for(i = 1 ; i <= maxkeylength ; i++){
 		key_space += pow(charset.size, i); 
 		subspaces[i-1] = key_space;
 	}
@@ -87,7 +87,7 @@ unsigned int get_max_key_length(){
 	return max_key_length;
 }
 
-struct charset *get_charset(){
+struct arrayset *get_charset(){
 	return &charset;
 }
 

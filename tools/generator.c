@@ -12,23 +12,19 @@
 #include "generator.h"
 #include "../devices/reduction.h"
 #include "../lib/hashTable3.h"
-#include "../lib/spclib.h"
-#include "../lib/space.h"
+#include "../lib/util.h"
+#include "../lib/keyspace.h"
 
-
-static const unsigned int THREADS_NUMBER = 8;
-static const char *RB_TABLES_PATH = "storage/";
-
-static const char *DIRECTORY;		// GLOBAL VAR
 
 
 static unsigned int table_length;
 static unsigned int chain_length;
 static unsigned int ntables;
 
-// global vars
+// shared global vars
 static unsigned long long collisions;
 static unsigned int chains;
+
 static unsigned int i_index;
 static unsigned int num_table;			
 
