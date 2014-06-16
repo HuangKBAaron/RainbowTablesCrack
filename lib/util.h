@@ -22,12 +22,17 @@
 #define DEFAULT_MKEY_LENGTH  6
 #define MIN_MKEY_LENGTH      1
 
-#define MIN_FLAG     "a"
-#define MAY_FLAG     "A"
-#define NUM_FLAG     "0"
-#define SPE_FLAG     "*"
-
 #define RAINBOW_TABLES_PATH "/usr/share/rainbow_table_tool/storage/"
+
+
+enum CharsetType {
+	MIN,
+	MAY,
+	NUM,
+	SPE
+}; 
+
+
 
 
 void itoa(int n, char *s);

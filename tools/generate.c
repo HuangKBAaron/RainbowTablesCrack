@@ -16,28 +16,27 @@
 #include "../lib/keyspace.h"
 
 
+static struct generate_ctx{
+	unsigned int tablelength;
+	unsigned int chainlength;
+	unsigned int tables;
+}
 
-static unsigned int table_length;
-static unsigned int chain_length;
-static unsigned int ntables;
+static struct shared{
+	unsigned long long collision_ctr;
+	unsigned int genchain_ctr;
+	unsigned int index_ctr;
+	unsigned int current_table;			
 
-// shared global vars
-static unsigned long long collisions;
-static unsigned int chains;
-
-static unsigned int i_index;
-static unsigned int num_table;			
-
-static Mmp_Hash hash_table;
-
+	Mmp_Hash hash_table;
+}
 
 sem_t  sem;  /* Semaforo */
 sem_t  sem2;  /* Semaforo 2 */
 
 
 
-
-static const char *name_directory(int key_length, char *domain_tag, unsigned int ch_length, int tables);
+static const char *name_directory(int klen, char *domain_tag, unsigned int chlen, int tbls);
 static unsigned int generate_table(int n_table);
 static unsigned long long generate_chain(unsigned long long indexInicial, int tabla);
 static void *child(void *v);
