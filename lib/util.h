@@ -22,7 +22,13 @@
 #define DEFAULT_MKEY_LENGTH  6
 #define MIN_MKEY_LENGTH      1
 
-#define RAINBOW_TABLES_PATH "/usr/share/rainbow_table_tool/storage/"
+#define RBT_PATH "/usr/share/rainbow_table_tool/storage/"
+#define RBT_NAME "rbt"
+
+#define MIN_CHAR "a"
+#define MAY_CHAR "A"
+#define NUM_CHAR "0"
+#define SPE_CHAR "*"
 
 
 enum CharsetType {
@@ -36,3 +42,5 @@ enum CharsetType {
 
 
 void itoa(int n, char *s);
+char *name_rbt_package(unsigned int keylen, unsigned int *charset_types, unsigned int chainlen, unsigned int tables);
+char *name_rbt_n(char *package, unsigned int table);

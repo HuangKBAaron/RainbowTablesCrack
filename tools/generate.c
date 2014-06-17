@@ -20,6 +20,9 @@ static struct generate_ctx{
 	unsigned int tablelength;
 	unsigned int chainlength;
 	unsigned int tables;
+	unsigned int threads;
+
+	char *rbt_package;
 }
 
 static struct shared{
@@ -36,7 +39,6 @@ sem_t  sem2;  /* Semaforo 2 */
 
 
 
-static const char *name_directory(int klen, char *domain_tag, unsigned int chlen, int tbls);
 static unsigned int generate_table(int n_table);
 static unsigned long long generate_chain(unsigned long long indexInicial, int tabla);
 static void *child(void *v);
@@ -44,37 +46,9 @@ static void *child(void *v);
 
 
 
-static const char * 
-name_directory(unsigned int key_length, char *charset_tag, unsigned int chain_length, unsigned int tables){
-
-    char kl[3];
-    char cl[10];
-    char nt[3];
-
-    itoa(key_length,kl);
-    itoa(chain_length,cl);
-    itoa(tables,nt);
-
-    char *str = malloc(strlen(RB_TABLE_PATH) + strlen(RB_TABLE_NAME) + 1 + strlen(kl) + 1 + strlen(charset_tag) + 1 + strlen(cl) + 1 + strlen(nt) + 1);
-
-    strcpy(str, RB_TABLE_PATH);
-    strncat(str, RB_TABLE_NAME, strlen(RB_TABLE_NAME));
-    strncat(str, "_", 1);
-    strncat(str, kl, strlen(kl));
-    strncat(str, "_", 1);
-    strncat(str, charset_tag, strlen(charset_tag));
-    strncat(str, "_", 1);
-    strncat(str, cl, strlen(cl));
-    strncat(str, "_", 1);
-    strncat(str, nt, strlen(nt));
-    strncat(str, "/", 1);
-
-    return str;
-
-}
-
 void 
-init_generator(unsigned int k_length, char *cs_tag, unsigned int t_length, unsigned int ch_length, unsigned int tables){
+init_rbt(unsigned int keylen, unsigned int *charset_types, 
+							unsigned int tablelen, unsigned int chainlen, unsigned int tables, unsigned int threads){
 
 	if(sem_init(&sem, 0, 1) == -1){
 		perror( "can't init the semaphore" );
@@ -86,36 +60,24 @@ init_generator(unsigned int k_length, char *cs_tag, unsigned int t_length, unsig
 		exit(EXIT_FAILURE);
 	}
 
-	init_reduction(k_length, d_tag);
+	init_reduction(keylen, charset_types);
 
-	DIRECTORY = name_directory(k_length, cs_tag, ch_length, tables);
+	generate_ctx.tablelen = tablelen;
+	generate_ctx.chainlen = chainlen;
+	generate_ctx.tables = tables;
+	genchain_ctr.threads = threads;
 
-	if(mkdir(DIRECTORY,S_IRWXU) !=0){
+	generate_ctx.rbt_package = name_rbt_package(keylen, charset_types, chainlen, tables);
+
+	if(mkdir(generate_ctx.rbt_package, S_IRWXU) !=0){
 		printf("Error al crear la carpeta\n");
 	}
 
-	i_index = 0;
-	collisions = 0 ;
-
-	table_length = t_length;
-	chain_length = ch_length;
-	ntables = tables;
+	shared.collision_ctr = 0;
+	shared.index_ctr = 0;
 
 }
 
-static const char *
-name_table(unsigned int table){
-
-    char nt[3];
-
-    itoa(table, nt);
-
-    char *str = malloc(strlen(DIRECTORY) + strlen(nt));
-    strncat(str, DIRECTORY, strlen(DIRECTORY));
-    strncat(str, nt, strlen(nt));
-
-    return str;
-}
 
 static pthread_t
 newproc(void *(*tmain)(void *), void *args)
@@ -166,12 +128,12 @@ child(void *v)
 static unsigned int 
 generate_table(unsigned int n_table)
 {
-	num_table =  n_table;
-	chains = 0 ;
+	shared.current_table =  n_table;
+	shared.genchain_ctr = 0 ;
 
-	char *name = name_table(t);
+	char *table_name = name_rbt_n(t);
 
-	create_hash_table3(&hash_table, name);
+	create_hash_table3(&hash_table, table_name);
 
 	pthread_t  *childs;
 	childs = malloc(THREADS_NUMBER * sizeof(pthread_t));
@@ -217,10 +179,10 @@ generate_chain(unsigned long long indexInicial, unsigned int tabla)
 }
 
 void 
-generate_rainbow_tables()
+generate_rbt()
 {
 	int i ;
-	for(i = 0 ; i < ntables ; i++){
+	for(i = 0 ; i < generate_ctx.tables ; i++){
 		generate_table(i);
 	}
 }
