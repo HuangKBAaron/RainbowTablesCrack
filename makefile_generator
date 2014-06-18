@@ -1,0 +1,21 @@
+# makefile para generator, versión 1 
+# uso de variables; reglas predefinidas
+
+CC = gcc -pthread
+OBJECTS = devices/reduction.o lib/hashTable3.o lib/util.o lib/keyspace.o tools/generate.o 
+
+rbt_generate: ui/generator_ui.o $(OBJECTS)
+	$(CC) -o rbt_generate ui/generator_ui.o $(OBJECTS) -lm -lcrypto
+
+ui/generator_ui.o: tools/generate.h lib/util.h
+lib/hashTable3.o: lib/hashTable3.h
+lib/keyspace.o: lib/keyspace.h
+lib/util.o: lib/util.h
+devices/reduction.o: devices/reduction.h lib/keyspace.h
+tools/generate.o: tools/generate.h devices/reduction.h lib/hashTable3.h lib/util.h
+
+
+
+.PHONY : clean
+    clean :
+	-rm rbt_generate $(OBJECTS) 

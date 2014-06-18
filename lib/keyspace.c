@@ -83,7 +83,7 @@ unsigned long long get_subspace(unsigned int i){
 	return subspaces[i];
 }
 
-unsigned int get_max_key_length(){
+unsigned int get_key_length(){
 	return max_key_length;
 }
 

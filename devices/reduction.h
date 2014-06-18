@@ -1,4 +1,4 @@
-void reduction_init(int k_length, char *tag);
+void init_reduction(int k_length, char *tag);
 
 void sha2plain(unsigned char *sha, int offset, int table, char *plain);
 void sha2plain_64(unsigned char *sha, int offset, int table, char *plain);

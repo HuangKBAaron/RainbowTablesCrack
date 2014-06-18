@@ -11,7 +11,7 @@ static int reduction_length(unsigned long long index);
 
 
 void 
-reduction_init(int k_length, char *tag){
+init_reduction(int k_length, char *tag){
 
 	init_keyspace(k_length, tag);
 }

@@ -9,38 +9,42 @@
 #include <sys/types.h>
 #include <openssl/sha.h>
 
-#include "generator.h"
+#include "generate.h"
 #include "../devices/reduction.h"
 #include "../lib/hashTable3.h"
 #include "../lib/util.h"
 #include "../lib/keyspace.h"
 
 
-static struct generate_ctx{
-	unsigned int tablelength;
-	unsigned int chainlength;
+struct Ctx {
+	unsigned int keylen;
+	unsigned int tablelen;
+	unsigned int chainlen;
 	unsigned int tables;
 	unsigned int threads;
 
 	char *rbt_package;
-}
+};
 
-static struct shared{
+struct Shared{
 	unsigned long long collision_ctr;
 	unsigned int genchain_ctr;
 	unsigned int index_ctr;
 	unsigned int current_table;			
 
 	Mmp_Hash hash_table;
-}
+};
+
+struct Ctx generate_ctx;
+struct Shared shared;
 
 sem_t  sem;  /* Semaforo */
 sem_t  sem2;  /* Semaforo 2 */
 
 
 
-static unsigned int generate_table(int n_table);
-static unsigned long long generate_chain(unsigned long long indexInicial, int tabla);
+static void generate_table(unsigned int n_table);
+static unsigned long long generate_chain(unsigned int init_point, unsigned int table);
 static void *child(void *v);
 
 
@@ -48,7 +52,7 @@ static void *child(void *v);
 
 void 
 init_rbt(unsigned int keylen, unsigned int *charset_types, 
-							unsigned int tablelen, unsigned int chainlen, unsigned int tables, unsigned int threads){
+			unsigned int tablelen, unsigned int chainlen, unsigned int tables, unsigned int threads){
 
 	if(sem_init(&sem, 0, 1) == -1){
 		perror( "can't init the semaphore" );
@@ -62,20 +66,19 @@ init_rbt(unsigned int keylen, unsigned int *charset_types,
 
 	init_reduction(keylen, charset_types);
 
+	generate_ctx.keylen = keylen;
 	generate_ctx.tablelen = tablelen;
 	generate_ctx.chainlen = chainlen;
 	generate_ctx.tables = tables;
-	genchain_ctr.threads = threads;
-
+	generate_ctx.threads = threads;
 	generate_ctx.rbt_package = name_rbt_package(keylen, charset_types, chainlen, tables);
 
 	if(mkdir(generate_ctx.rbt_package, S_IRWXU) !=0){
-		printf("Error al crear la carpeta\n");
+		printf("cant't make directory\n");
 	}
 
 	shared.collision_ctr = 0;
 	shared.index_ctr = 0;
-
 }
 
 
@@ -97,26 +100,26 @@ newproc(void *(*tmain)(void *), void *args)
 static void *
 child(void *v)
 {
-	unsigned long long index_f ;
-	unsigned int index_0 ;
+	unsigned int init_point;
+	unsigned long long end_point;
 
 	sem_wait(&sem);	// down()
-	while(chains < table_length){
+	while(shared.genchain_ctr < generate_ctx.tablelen){
 		sem_post(&sem);	// up()
 
 		sem_wait(&sem2);	// down()
-			i_index++ ;
-			index_0 = i_index ;
+			shared.index_ctr++;
+			init_point = shared.index_ctr;
 		sem_post(&sem2);	// up()
 
-		index_f = generate_chain(index_0,num_table);
+		end_point = generate_chain(init_point, shared.current_table);
 
 		sem_wait(&sem);	// down()
-			if(get3(&hash_table,index_f)){
-				collisions++;
+			if(get3(&(shared.hash_table), end_point)){
+				shared.collision_ctr++;
 			}else{
-				put3(&hash_table,index_f,index_0);
-				chains++;
+				put3(&(shared.hash_table), end_point, init_point);
+				shared.genchain_ctr++;
 			}
 	}
 	sem_post(&sem);	// up()
@@ -125,55 +128,54 @@ child(void *v)
 	pthread_exit(0);
 }
 
-static unsigned int 
+static void 
 generate_table(unsigned int n_table)
 {
 	shared.current_table =  n_table;
 	shared.genchain_ctr = 0 ;
 
-	char *table_name = name_rbt_n(t);
+	char *table_name = name_rbt_n(generate_ctx.rbt_package, n_table);
 
-	create_hash_table3(&hash_table, table_name);
+	create_hash_table3(&(shared.hash_table), table_name);
 
 	pthread_t  *childs;
-	childs = malloc(THREADS_NUMBER * sizeof(pthread_t));
+	childs = malloc(generate_ctx.threads * sizeof(pthread_t));
 
 	/*
 	 * crea todos los threads
 	 */
 	int i;
-	for(i = 0; i < THREADS_NUMBER ; i++){
+	for(i = 0; i < generate_ctx.threads ; i++){
 		childs[i] = newproc(child, NULL);
 	}
 	/*
 	 * espera a que acaben todos los threads
 	 */
-	for(i= 0; i <  THREADS_NUMBER; i++)
+	for(i= 0; i <  generate_ctx.threads; i++)
 		pthread_join(childs[i], NULL);
 	free(childs);
 
-	close_hash_table3(&hash_table);
+	close_hash_table3(&(shared.hash_table));
 
-	printf("Colisiones: %u\n",collisions);
-
-	return i_index;	
+	printf("Colisiones: %llu\n", shared.collision_ctr);
 }
 
 static unsigned long long
-generate_chain(unsigned long long indexInicial, unsigned int tabla)
+generate_chain(unsigned int init_point, unsigned int table)
 {
-	char r[MAX_KEY_LENGTH+1];
+	char *r = malloc(generate_ctx.keylen + 1);
 	unsigned char sha[20];
 
 	unsigned long long index;
-	index = indexInicial;
+	index = init_point;
 
 	int i;
-	for(i = 0; i < chain_length ; i++){
-		index2plain(index,r);
-                SHA1(r, strlen(r), sha);	
-		index = sha2index(sha, i, tabla);
+	for(i = 0; i < generate_ctx.chainlen ; i++){
+		index2plain(index, r);
+        SHA1(r, strlen(r), sha);	
+		index = sha2index(sha, i, table);
 	}
+	free(r);
 
 	return index;
 }
@@ -181,7 +183,7 @@ generate_chain(unsigned long long indexInicial, unsigned int tabla)
 void 
 generate_rbt()
 {
-	int i ;
+	unsigned int i ;
 	for(i = 0 ; i < generate_ctx.tables ; i++){
 		generate_table(i);
 	}

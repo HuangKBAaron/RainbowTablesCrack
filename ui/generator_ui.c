@@ -4,11 +4,8 @@
 #include <sys/types.h>
 #include <time.h>
 #include <string.h>
-#include "../tools/generator.h"
+#include "../tools/generate.h"
 #include "../lib/util.h"
-
-
-
 
 
 // ./generate -l 6 -a -cl 1000 -t 4 -tl 10000 -ths 8
@@ -22,13 +19,13 @@ Numero de tablas: 4
 
 
 void print_usage() {
-	printf("Usage: rainbow_tables_generator [--version]\n");
-	printf("                                [--keylen key_length]\n");
-	printf("                                [--min --may --num --special]\n");
-	printf("                                [--chainlen chain_length]\n");
-	printf("                                [--tablelen table_length]\n");
-	printf("                                [--tables tables]\n");
-	printf("                                [--threads threads]\n");
+	printf("Usage: generate_rbt [--version]\n");
+	printf("                    [--keylen key_length]\n");
+	printf("                    [--min --may --num --special]\n");
+	printf("                    [--chainlen chain_length]\n");
+	printf("                    [--tablelen table_length]\n");
+	printf("                    [--tables tables]\n");
+	printf("                    [--threads threads]\n");
 }
 
 void print_version() {
@@ -37,10 +34,12 @@ void print_version() {
 
 
 
-void main (argc, argv)
+int main (argc, argv)
 int argc;
 char *argv[];
 {
+	char *ptr;
+
 	int _vflag = 0;
 	int _hflag = 0;
 	int _kflag = 0;
@@ -48,12 +47,12 @@ char *argv[];
 	int _lflag = 0;
 	int _tflag = 0;	
 	int _Tflag = 0;
-	char *_kvalue = NULL;
-	char *_cvalue = NULL;
-	char *_lvalue = NULL;
-	char *_tvalue = NULL;
-	char *_Tvalue = NULL;
-	unsigned int *_charset = {0, 0, 0, 0};	// {minuscules, mayuscules, numeric, special characters}
+	unsigned int _kvalue = 0;
+	unsigned int _cvalue = 0;
+	unsigned int _lvalue = 0;
+	unsigned int _tvalue = 0;
+	unsigned int _Tvalue = 0;
+	unsigned int _charset[4] = {0, 0, 0, 0};	// {minuscules, mayuscules, numeric, special characters}
 
 
 	int opt = 0;
@@ -106,27 +105,27 @@ char *argv[];
      
 			case 'k':
 				_kflag = 1;
-				_kvalue = optarg;
+				_kvalue = strtoul(optarg, &ptr, 10);
 				break;
 
 			case 'c':
 				_cflag = 1;
-				_cvalue = optarg;
+				_cvalue = strtoul(optarg, &ptr, 10);
 				break;
 
 			case 'l':
 				_lflag = 1;
-				_lvalue = optarg;
+				_lvalue = strtoul(optarg, &ptr, 10);
 				break;
 
 			case 't':
 				_tflag = 1;
-				_tvalue = optarg;
+				_tvalue = strtoul(optarg, &ptr, 10);
 				break;
 
 			case 'T':
 				_Tflag = 1;
-				_Tvalue = optarg;
+				_Tvalue = strtoul(optarg, &ptr, 10);
 				break;
 
 			case ':':   /* missing option argument */
@@ -142,49 +141,58 @@ char *argv[];
 		}
 	}
 
-	if(vflag){
+	if(_vflag){
 		print_version();
 		return 0;
 	}
 
-	if(hflag){
+	if(_hflag){
 		print_usage();
 		return 0;
 	}
 
 	if(! (_charset[MIN] || _charset[MAY] || _charset[NUM] || _charset[SPE])){
+		printf("Unless one of --min --may --num --spe is required\n");
 		print_usage();
 		return 1;
-	}
- 		
+	}		
 
 	if(! _tflag){
+		printf("--tables is required\n");
 		print_usage();
 		return 1;
 	}
 
 	if(! _kflag){
+		printf("--keylen is required\n");
 		print_usage();
 		return 1;
 	}
 
 	if(! _cflag){
+		printf("--chainlen is required\n");
 		print_usage();	
 		return 1;
 	}
 
 
 	if(! _lflag){
+		printf("--tablelen is required\n");
 		print_usage();
 		return 1;
 	}
 
 
 	if(! _Tflag){
-		_Tvalue = <default>
+		_Tvalue = 8;
 	}
 
+	/*
+	printf("keyleng: %u, charset: %u, %u, %u, %u, chainlen: %u, tablelen: %u, tables: %u, threads: %u\n", 
+													_kvalue, _charset[0], _charset[1], _charset[2], _charset[3],
+													_cvalue, _lvalue, _tvalue, _Tvalue);
+	*/
 
 
-	generate_tables(kvalue, &_charset, _cvalue, _lvalue, _tvalue, _Tvalue);
+	init_rbt(_kvalue, &_charset, _cvalue, _lvalue, _tvalue, _Tvalue);
 }
