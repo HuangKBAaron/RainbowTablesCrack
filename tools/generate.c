@@ -170,7 +170,7 @@ generate_chain(unsigned int init_point, unsigned int table)
 	unsigned long long index;
 	index = init_point;
 
-	int i;
+	unsigned int i;
 	for(i = 0; i < generate_ctx.chainlen ; i++){
 		index2plain(index, r);
         SHA1(r, strlen(r), sha);	

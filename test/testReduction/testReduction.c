@@ -40,12 +40,29 @@ void test_reduction_opt(){
 }
 
 
+void test_index2plain(){
+
+    unsigned int charset_test[4] = {1, 1, 1, 1};
+    unsigned int keylen = 6;
+
+    init_reduction(keylen, charset_test);
+
+    char *r = malloc(10);  
+    unsigned int i;
+    for(i=0 ; i < 200 ; i++){
+        index2plain(i, r);
+        printf("%u -> %s\n", i, r);
+    }
+    
+}
+
 
 
 void main (argc, argv)
 int argc;
 char *argv[];
 {
+    /*
     clock_t t_ini1, t_fin1;
     clock_t t_ini2, t_fin2;
     double secs1, secs2;
@@ -68,6 +85,9 @@ char *argv[];
 
     secs2 = (double)(t_fin2 - t_ini2) / CLOCKS_PER_SEC;
     printf("TEST2: %.16g milisegundos\n", secs2 * 1000.0);
+    */
+
+    test_index2plain();
 
     return 0;
 }

@@ -87,10 +87,12 @@ index2plain_64(unsigned long long index, char *plain)
 /* Returns the length of the word represented by the index */
 static unsigned int 
 reduction_length(unsigned long long index){
-	unsigned int i;
-	for( i = get_key_length() - 2 ; i >= 0 ; i--){
+
+	int i;
+	for(i = get_key_length() - 2 ; i >= 0 ; i--){
+
 		if(index >= get_subspace(i))
-			return i+2;
+			return i + 2;
 	}
 	return 1;
 }
