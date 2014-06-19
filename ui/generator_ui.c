@@ -19,13 +19,13 @@ Numero de tablas: 4
 
 
 void print_usage() {
-	printf("Usage: generate_rbt [--version]\n");
-	printf("                    [--keylen key_length]\n");
+	printf("Usage: generate_rbt [--version] |\n");
+	printf("                    [--keylen max_password_length]\n");
 	printf("                    [--min --may --num --special]\n");
 	printf("                    [--chainlen chain_length]\n");
 	printf("                    [--tablelen table_length]\n");
-	printf("                    [--tables tables]\n");
-	printf("                    [--threads threads]\n");
+	printf("                    [--tables tables_number]\n");
+	printf("                    [--threads threads_number]\n");
 }
 
 void print_version() {
@@ -152,47 +152,68 @@ char *argv[];
 	}
 
 	if(! (_charset[MIN] || _charset[MAY] || _charset[NUM] || _charset[SPE])){
+		/*
 		printf("Unless one of --min --may --num --spe is required\n");
 		print_usage();
 		return 1;
+		*/
+		// default charset
+		_charset[MIN] = 1;
 	}		
 
-	if(! _tflag){
-		printf("--tables is required\n");
-		print_usage();
-		return 1;
-	}
-
 	if(! _kflag){
+		/*
 		printf("--keylen is required\n");
 		print_usage();
 		return 1;
+		*/
+		_kvalue = DEFAULT_MKEY_LENGTH;
 	}
 
 	if(! _cflag){
+		/*
 		printf("--chainlen is required\n");
 		print_usage();	
 		return 1;
+		*/
+		_cvalue = DEFAULT_CHAIN_LENGTH;
 	}
 
 
 	if(! _lflag){
+		/*
 		printf("--tablelen is required\n");
 		print_usage();
 		return 1;
+		*/
+		_lvalue = DEFAULT_TABLE_LENGTH;
 	}
 
+	if(! _tflag){
+		/*
+		printf("--tables is required\n");
+		print_usage();
+		return 1;
+		*/
+		_tvalue = DEFAULT_TABLES;
+	}
 
 	if(! _Tflag){
-		_Tvalue = 8;
+		_Tvalue = DEFAULT_THREADS;
 	}
 
+
 	/*
-	printf("keyleng: %u, charset: %u, %u, %u, %u, chainlen: %u, tablelen: %u, tables: %u, threads: %u\n", 
+	printf("kflag: %d, _cflag: %d, lflag: %d, tflag: %d, Tflag: %d\n", 
+													_kflag, _cflag, _lflag, _tflag, _Tflag);
+	
+	printf("keylen: %u, charset: %u, %u, %u, %u, chainlen: %u, tablelen: %u, tables: %u, threads: %u\n", 
 													_kvalue, _charset[0], _charset[1], _charset[2], _charset[3],
 													_cvalue, _lvalue, _tvalue, _Tvalue);
 	*/
+	
 
 
 	init_rbt(_kvalue, &_charset, _cvalue, _lvalue, _tvalue, _Tvalue);
+	generate_rbt();
 }

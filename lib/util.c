@@ -51,7 +51,7 @@ name_rbt_package(unsigned int keylen, unsigned int *charset_types, unsigned int 
     itoa(chainlen, chainlen_str);
     itoa(tables, tables_str);
 
-    unsigned int pathlen = strlen(RBT_PATH);
+    unsigned int pathlen = strlen(RBT_PATH_DEFAULT);
     unsigned int namelen = strlen(RBT_NAME);
     unsigned int keylen_strlen = strlen(keylen_str);
     unsigned int charset_strlen = charset_types[MIN] + charset_types[MAY] + charset_types[NUM] + charset_types[SPE];
@@ -60,7 +60,7 @@ name_rbt_package(unsigned int keylen, unsigned int *charset_types, unsigned int 
 
     char *toReturn = malloc(pathlen + namelen + keylen_strlen + charset_strlen + chainlen_strlen + tables_strlen + 4);
 
-    strncpy(toReturn, RBT_PATH, pathlen);
+    strncpy(toReturn, RBT_PATH_DEFAULT, pathlen);
     strncat(toReturn, RBT_NAME, namelen);
     strncat(toReturn, "_", 1);
     strncat(toReturn, keylen_str, keylen_strlen);

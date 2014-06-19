@@ -6,14 +6,14 @@
 
 
 
-static int reduction_length(unsigned long long index);
+static unsigned int reduction_length(unsigned long long index);
 
 
 
 void 
-init_reduction(int k_length, char *tag){
+init_reduction(unsigned int keylen, unsigned int *charset_types){
 
-	init_keyspace(k_length, tag);
+	init_keyspace(keylen, charset_types);
 }
 
 
@@ -21,7 +21,7 @@ init_reduction(int k_length, char *tag){
 /* reduction function: a different function for each column */
 /* transform a sha into a plaintext */
 void
-sha2plain(unsigned char *sha, int offset, int table, char *plain)
+sha2plain(unsigned char *sha, unsigned int offset, unsigned int table, char *plain)
 {
 	unsigned long long *pUll = &(sha[12]);
 
@@ -30,7 +30,7 @@ sha2plain(unsigned char *sha, int offset, int table, char *plain)
 
 /* transform a sha into a plaintext. |Charset| must be equal to 64 */
 void
-sha2plain_64(unsigned char *sha, int offset, int table, char *plain)
+sha2plain_64(unsigned char *sha, unsigned int offset, unsigned int table, char *plain)
 {
 	unsigned long long *pUll = &(sha[12]);
 
@@ -40,7 +40,7 @@ sha2plain_64(unsigned char *sha, int offset, int table, char *plain)
 
 /*transform a sha into a index*/
 unsigned long long
-sha2index(unsigned char *sha, int offset, int table)
+sha2index(unsigned char *sha, unsigned int offset, unsigned int table)
 {
 	unsigned long long *pUll = &(sha[12]);
 
@@ -51,11 +51,11 @@ sha2index(unsigned char *sha, int offset, int table)
 void
 index2plain(unsigned long long index, char *plain)
 {	
-	int rlength = reduction_length(index);
+	unsigned int rlength = reduction_length(index);
 
 	unsigned long long ind = index;
 
-	int j;
+	unsigned int j;
 	for( j = 0 ; j < rlength ; j++ ){
 		plain[j] = get_charset()->elements[ind%get_charset()->size];
 		ind /= get_charset()->size;
@@ -68,11 +68,11 @@ index2plain(unsigned long long index, char *plain)
 void
 index2plain_64(unsigned long long index, char *plain)
 {
-	int rlength = reduction_length(index);
+	unsigned int rlength = reduction_length(index);
 
 	unsigned long long ind = index;
 
-	int j, k;
+	unsigned int j, k;
 	for( j = 0 ; j < rlength ; j++ ){
 		k = ind & 0x3F;
 
@@ -85,14 +85,12 @@ index2plain_64(unsigned long long index, char *plain)
 
 
 /* Returns the length of the word represented by the index */
-static int 
+static unsigned int 
 reduction_length(unsigned long long index){
-	int i;
+	unsigned int i;
 	for( i = get_key_length() - 2 ; i >= 0 ; i--){
 		if(index >= get_subspace(i))
 			return i+2;
 	}
 	return 1;
 }
-
-

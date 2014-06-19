@@ -2,53 +2,53 @@
 #include <stdio.h>
 #include <math.h>
 #include "keyspace.h"
+#include "util.h"
 
 
 
 static unsigned long long key_space;					
-static unsigned long long subspaces[MAX_KEY_LENGTH];		// array of index of sizes
+static unsigned long long subspaces[MAX_MKEY_LENGTH];		// array of index of sizes
 
 
-static int max_key_length;
+static unsigned int max_key_length;
 static struct arrayset charset;
 
 
 
-static void init_charset(struct arrayset *charset, char *tag);
+static void init_charset(struct arrayset *charset, unsigned int *charset_types);
 
 
 
 
 static void 
-init_charset(struct arrayset *charset, char *tag){
+init_charset(struct arrayset *charset, unsigned int *charset_types){
+
 	char i;
-	char *pch;
 
 	charset->size = 0;
 
-	pch = strchr(tag,'a');
-	if(pch != NULL){
+	if(charset_types[MIN]){
 		for(i = 'a'; i <= 'z' ; i++){
 			charset->elements[charset->size] = i;
 			charset->size++;
 		}
 	}
-	pch = strchr(tag,'A');
-	if(pch != NULL){
+
+	if(charset_types[MAY]){
 		for(i = 'A'; i <= 'Z' ; i++){
 			charset->elements[charset->size] = i;
 			charset->size++;
 		}
 	}
-	pch = strchr(tag,'0');
-	if(pch != NULL){
+
+	if(charset_types[NUM]){
 		for(i = '0'; i <= '9' ; i++){
 			charset->elements[charset->size]= i;
 			charset->size++;
 		}
 	}
-	pch = strchr(tag,'*');
-	if(pch != NULL){
+
+	if(charset_types[SPE]){
 		charset->elements[charset->size]= '.';
 		charset->size++;
 
@@ -57,15 +57,13 @@ init_charset(struct arrayset *charset, char *tag){
 	}
 }
 
+void init_keyspace(unsigned int maxkeylength, unsigned int *charset_types){
 
-
-void init_keyspace(const char *charset_tag, unsigned int maxkeylength){
-
-	init_charset(&charset, charset_tag);
+	init_charset(&charset, charset_types);
 
 	key_space = 0;
 
-	int i;
+	unsigned int i;
 	for(i = 1 ; i <= maxkeylength ; i++){
 		key_space += pow(charset.size, i); 
 		subspaces[i-1] = key_space;
@@ -73,7 +71,6 @@ void init_keyspace(const char *charset_tag, unsigned int maxkeylength){
 
 	max_key_length = maxkeylength;	
 }
-
 
 unsigned long long get_keyspace(){
 	return key_space;
@@ -90,5 +87,3 @@ unsigned int get_key_length(){
 struct arrayset *get_charset(){
 	return &charset;
 }
-
-

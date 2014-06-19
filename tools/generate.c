@@ -52,7 +52,7 @@ static void *child(void *v);
 
 void 
 init_rbt(unsigned int keylen, unsigned int *charset_types, 
-			unsigned int tablelen, unsigned int chainlen, unsigned int tables, unsigned int threads){
+			unsigned int chainlen, unsigned int tablelen, unsigned int tables, unsigned int threads){
 
 	if(sem_init(&sem, 0, 1) == -1){
 		perror( "can't init the semaphore" );
@@ -75,6 +75,7 @@ init_rbt(unsigned int keylen, unsigned int *charset_types,
 
 	if(mkdir(generate_ctx.rbt_package, S_IRWXU) !=0){
 		printf("cant't make directory\n");
+		exit(1);
 	}
 
 	shared.collision_ctr = 0;
