@@ -58,7 +58,9 @@ name_rbt_package(unsigned int keylen, unsigned int *charset_types, unsigned int 
     unsigned int chainlen_strlen = strlen(chainlen_str);
     unsigned int tables_strlen = strlen(tables_str);
 
-    char *toReturn = malloc(pathlen + namelen + keylen_strlen + charset_strlen + chainlen_strlen + tables_strlen + 4);
+    unsigned int toReturnlen = pathlen + namelen + keylen_strlen + charset_strlen + chainlen_strlen + tables_strlen + 5;
+
+    char *toReturn = malloc(toReturnlen + 1);
 
     strncpy(toReturn, RBT_PATH_DEFAULT, pathlen);
     strncat(toReturn, RBT_NAME, namelen);
@@ -77,6 +79,9 @@ name_rbt_package(unsigned int keylen, unsigned int *charset_types, unsigned int 
     strncat(toReturn, chainlen_str, chainlen_strlen);
     strncat(toReturn, "_", 1);
     strncat(toReturn, tables_str, tables_strlen);
+    strncat(toReturn, "/", 1);
+
+    toReturn[toReturnlen] = '\0';
 
     return toReturn;
 }
@@ -89,13 +94,19 @@ name_rbt_n(char *package, unsigned int table){
     itoa(table, table_str);
 
     unsigned int packagelen = strlen(package);
+    unsigned int namelen = strlen(RBT_NAME);
     unsigned int table_strlen = strlen(table_str);
 
-    char *toReturn = malloc(packagelen + table_strlen + 1);
+    unsigned int toReturnlen = packagelen + namelen + table_strlen + 1;
 
-    strncpy(toReturn, package, packagelen);
-    strncat(toReturn, "/", 1);
+    char *toReturn = malloc(toReturnlen + 1);
+
+    strcpy(toReturn, package);
+    strncat(toReturn, RBT_NAME, namelen);
+    strncat(toReturn, "_", 1);
     strncat(toReturn, table_str, table_strlen);
+
+    toReturn[toReturnlen] = '\0';
 
     return toReturn;
 }

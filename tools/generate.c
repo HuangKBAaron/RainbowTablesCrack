@@ -136,8 +136,11 @@ generate_table(unsigned int n_table)
 	shared.genchain_ctr = 0 ;
 
 	char *table_name = name_rbt_n(generate_ctx.rbt_package, n_table);
-
+	printf("table name: %s\n", table_name);
 	create_hash_table3(&(shared.hash_table), table_name);
+	
+	free(table_name);
+	table_name = NULL;
 
 	pthread_t  *childs;
 	childs = malloc(generate_ctx.threads * sizeof(pthread_t));
