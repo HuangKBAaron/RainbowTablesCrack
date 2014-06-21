@@ -22,7 +22,7 @@ struct Ctx {
 	unsigned int threads;
 
 	FILE *fp_digest;
-	Mmp_Hash tables[MAX_TABLES];
+	Mmp_Hash rbt_tables[MAX_TABLES];
 };
 
 struct Shared{
@@ -40,27 +40,39 @@ sem_t  sem3;  /* Semaforo 3 */
 
 
 static void load_hashes_file(char *file);
-static void load_rainbow_tables(char *dir);
+static void load_rainbow_tables(char *package, unsigned int n_tables, Mmp_Hash *rbt_tables);
 static void search_sha(unsigned char *searchedSha, unsigned long initWord, unsigned int max_ite, int table, char *r);
 static int lookup(unsigned char *searchedSha, int table);
 static void *child(void *v);
 
 
 
-//rt_keylenth_keydomain_chainlength_tables/1
 static void 
-load_rainbow_tables(dir){
+load_rainbow_tables(char *package, unsigned int n_tables, Mmp_Hash *rbt_tables){
 
-	char loc[80];
-	char table[3];
+	unsigned int packagelen = strlen(package);
+	unsigned int namelen = strlen(RBT_NAME);
+	unsigned int ilen = 11;
+	unsigned int pkg_table_namelen = packagelen + namelen + ilen + 1;
 
-	int i;
-	for(i = 0 ; i < TABLES_NUMBER ; i++){
-		strcpy(loc, dir);
-		itoa(i,table);
-		strcat(loc,table);
-		init_hash_table3(&tables[i], loc);	
+	char *i_str = malloc(ilen);
+	char *pkg_table_name = malloc(pkg_table_namelen + 1);
+
+	unsigned int i;
+	for(i = 0 ; i < n_tables ; i++){
+
+		itoa(i, i_str);
+
+		strcpy(pkg_table_name, package);
+		strcat(pkg_table_name, RBT_NAME);
+		strcat(pkg_table_name, "_")
+		strcat(pkg_table_name, i_str);
+
+		init_hash_table3(&rbt_tables[i], pkg_table_name);	
 	}
+
+	free(i_str);
+	free(pkg_table_name);
 }
 
 static void 
@@ -82,16 +94,14 @@ init_break(char *package, unsigned int threads){
 	unsigned int keylen = 0;
 	char *charset_types = malloc(5);
 
+	read_rbt_package(package, &keylen, charset_types, &break_ctx.chainlen, &break_ctx.tables);
 	break_ctx.threads = threads;
 
-	read_rbt_package(package, &keylen, charset_types, &break_ctx.chainlen, &break_ctx.tables);
-
-	load_rainbow_tables(package);
+	load_rainbow_tables(package, break_ctx.tables, &break_ctx.rbt_tables);
+	reduction_init(keylen, charset_types);
 
 	shared.digest_ctr = 0;
 	shared.crack_ctr = 0;
-
-	reduction_init(keylen, charset_types);
 }
 
 static void 
@@ -120,43 +130,38 @@ newproc(void *(*tmain)(void *), void *args)
 }
 
 void
-break_file(char *hashes_file){
+break_file(char *digest_file){
 	
-	load_hashes_file(hashes_file);
+	load_digest_file(digest_file);
 
 	pthread_t  *childs;
-	childs = malloc(THREADS_NUMBER * sizeof(pthread_t));
+	childs = malloc(break_ctx.threads * sizeof(pthread_t));
 
 	/*
 	 * crea todos los threads
 	 */
 	int i;
-	for(i = 0; i < THREADS_NUMBER ; i++){
+	for(i = 0; i < break_ctx.threads ; i++){
 		childs[i] = newproc(child, NULL);
 	}
 	/*
 	 * espera a que acaben todos los threads
 	 */
-	for(i= 0; i <  THREADS_NUMBER; i++)
+	for(i= 0; i <  break_ctx.threads; i++)
 		pthread_join(childs[i], NULL);
 	free(childs);
 
 
 	printf("Se ha roto %u passwords de un total de %d, lo que supone un tasa de exito del %d%\n",cracks,hashes,cracks*100/hashes);
 	
-	for(i = 0 ; i < TABLES_NUMBER ; i++){
+	for(i = 0 ; i < break_ctx.threads ; i++){
 		close_hash_table3(&tables[i]);		
 	}
 
 	close(fhashesp);		
 }
 
-void SHAcpy(unsigned char*sha_1, unsigned char *sha_2){
-	int i;
-	for(i = 0 ; i < 20 ; i++){
-		sha_1[i] = sha_2[i];
-	}
-}
+
 
 static int
 lookup(unsigned char *searchedSha, int t){
@@ -202,16 +207,6 @@ lookup(unsigned char *searchedSha, int t){
 }
 
 
-int SHAcmp(unsigned char*sha_1, unsigned char *sha_2){
-	int i;
-	for(i = 3 ; i < 20 ; i++){
-		if(sha_1[i] != sha_2[i]){
-			return i+1;
-		}
-	}
-	return 0;
-}
-
 static void
 search_sha(unsigned char *searchedSha, unsigned long initWord, unsigned int max_ite, int table, char *r){
 	
@@ -231,18 +226,6 @@ search_sha(unsigned char *searchedSha, unsigned long initWord, unsigned int max_
 
 	r[0]='\0';
 }
-
-
-void string2sha(char *str, unsigned char *sha){
-	unsigned char hex[3];
-	int i;
-	for(i=0 ; i < 20 ; i++){
-		strncpy(hex,&str[i*2],2);	
-		sscanf(hex,"%x",&sha[i]);
-	}
-}
-
-
 
 static void *
 child(void *v)

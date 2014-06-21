@@ -39,6 +39,31 @@ static void reverse(char *s)
      }
  }
 
+void string2sha(char *str, unsigned char *sha){
+    unsigned char hex[3];
+    int i;
+    for(i=0 ; i < 20 ; i++){
+        strncpy(hex,&str[i*2],2);   
+        sscanf(hex,"%x",&sha[i]);
+    }
+}
+
+int SHAcmp(unsigned char*sha_1, unsigned char *sha_2){
+    int i;
+    for(i = 3 ; i < 20 ; i++){
+        if(sha_1[i] != sha_2[i]){
+            return i+1;
+        }
+    }
+    return 0;
+}
+
+void SHAcpy(unsigned char*sha_1, unsigned char *sha_2){
+    int i;
+    for(i = 0 ; i < 20 ; i++){
+        sha_1[i] = sha_2[i];
+    }
+}
 
 char * 
 name_rbt_package(unsigned int keylen, unsigned int *charset_types, unsigned int chainlen, unsigned int tables){
