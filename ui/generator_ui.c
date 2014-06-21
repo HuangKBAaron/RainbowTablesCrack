@@ -52,7 +52,7 @@ char *argv[];
 	unsigned int _lvalue = 0;
 	unsigned int _tvalue = 0;
 	unsigned int _Tvalue = 0;
-	unsigned int _charset[4] = {0, 0, 0, 0};	// {minuscules, mayuscules, numeric, special characters}
+	char _charset[5] = "";	
 
 
 	int opt = 0;
@@ -88,19 +88,19 @@ char *argv[];
 				break;
      
 			case 'a':
-				_charset[MIN] = 1;
+				strcat(_charset, MIN_STR);
 				break;
 
 			case 'A':
-				_charset[MAY] = 1;
+				strcat(_charset, MAY_STR);
 				break;
 
 			case '0':
-				_charset[NUM] = 1;
+				strcat(_charset, NUM_STR);
 				break;
      
 			case 's':
-				_charset[SPE] = 1;
+				strcat(_charset, SPE_STR);
 				break;
      
 			case 'k':
@@ -151,14 +151,14 @@ char *argv[];
 		return 0;
 	}
 
-	if(! (_charset[MIN] || _charset[MAY] || _charset[NUM] || _charset[SPE])){
+	if(strcmp(_charset, "") == 0){
 		/*
 		printf("Unless one of --min --may --num --spe is required\n");
 		print_usage();
 		return 1;
 		*/
 		// default charset
-		_charset[MIN] = 1;
+		strcat(_charset, MIN_STR);
 	}		
 
 	if(! _kflag){

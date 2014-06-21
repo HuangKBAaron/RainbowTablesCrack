@@ -9,7 +9,7 @@ struct arrayset {
 
 
 
-void init_keyspace(unsigned int keylen, unsigned int *charset_types);
+void init_keyspace(unsigned int keylen, char *charset_types);
 unsigned long long get_keyspace(void);
 unsigned long long get_subspace(unsigned int i);
 unsigned int get_key_lenth(void);

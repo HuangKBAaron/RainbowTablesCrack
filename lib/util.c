@@ -66,7 +66,7 @@ void SHAcpy(unsigned char*sha_1, unsigned char *sha_2){
 }
 
 char * 
-name_rbt_package(unsigned int keylen, unsigned int *charset_types, unsigned int chainlen, unsigned int tables){
+name_rbt_package(unsigned int keylen, char *charset_types, unsigned int chainlen, unsigned int tables){
 
     char keylen_str[11];
     char chainlen_str[11];
@@ -79,7 +79,7 @@ name_rbt_package(unsigned int keylen, unsigned int *charset_types, unsigned int 
     unsigned int pathlen = strlen(RBT_PATH_DEFAULT);
     unsigned int namelen = strlen(RBT_NAME);
     unsigned int keylen_strlen = strlen(keylen_str);
-    unsigned int charset_strlen = charset_types[MIN] + charset_types[MAY] + charset_types[NUM] + charset_types[SPE];
+    unsigned int charset_strlen = strlen(charset_types);
     unsigned int chainlen_strlen = strlen(chainlen_str);
     unsigned int tables_strlen = strlen(tables_str);
 
@@ -92,14 +92,7 @@ name_rbt_package(unsigned int keylen, unsigned int *charset_types, unsigned int 
     strncat(toReturn, "_", 1);
     strncat(toReturn, keylen_str, keylen_strlen);
     strncat(toReturn, "_", 1);
-    if(charset_types[MIN])
-        strncat(toReturn, MIN_CHAR, 1);
-    if(charset_types[MAY])
-        strncat(toReturn, MAY_CHAR, 1);
-    if(charset_types[NUM])
-        strncat(toReturn, NUM_CHAR, 1);
-    if(charset_types[SPE])
-        strncat(toReturn, SPE_CHAR, 1);
+    strncat(toReturn, charset_types, charset_strlen);
     strncat(toReturn, "_", 1);
     strncat(toReturn, chainlen_str, chainlen_strlen);
     strncat(toReturn, "_", 1);

@@ -51,7 +51,7 @@ static void *child(void *v);
 
 
 void 
-init_rbt(unsigned int keylen, unsigned int *charset_types, 
+init_rbt(unsigned int keylen, char *charset_types, 
 			unsigned int chainlen, unsigned int tablelen, unsigned int tables, unsigned int threads){
 
 	if(sem_init(&sem, 0, 1) == -1){
@@ -136,7 +136,7 @@ generate_table(unsigned int n_table)
 	shared.genchain_ctr = 0 ;
 
 	char *table_name = name_rbt_n(generate_ctx.rbt_package, n_table);
-	printf("table name: %s\n", table_name);
+
 	create_hash_table3(&(shared.hash_table), table_name);
 	
 	free(table_name);

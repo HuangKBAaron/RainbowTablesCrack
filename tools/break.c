@@ -11,7 +11,6 @@
 #include "../devices/reduction.h"
 #include "../lib/util.h"
 #include "../lib/hashTable3.h"
-#include "../lib/keyspace.h"
 #include "break.h"
 
 
@@ -39,7 +38,7 @@ sem_t  sem3;  /* Semaforo 3 */
 
 
 
-static void load_hashes_file(char *file);
+static void load_digest_file(char *file);
 static void load_rainbow_tables(char *package, unsigned int n_tables, Mmp_Hash *rbt_tables);
 static void search_sha(unsigned char *searchedSha, unsigned long initWord, unsigned int max_ite, int table, char *r);
 static int lookup(unsigned char *searchedSha, int table);
@@ -65,7 +64,7 @@ load_rainbow_tables(char *package, unsigned int n_tables, Mmp_Hash *rbt_tables){
 
 		strcpy(pkg_table_name, package);
 		strcat(pkg_table_name, RBT_NAME);
-		strcat(pkg_table_name, "_")
+		strcat(pkg_table_name, "_");
 		strcat(pkg_table_name, i_str);
 
 		init_hash_table3(&rbt_tables[i], pkg_table_name);	
@@ -75,7 +74,7 @@ load_rainbow_tables(char *package, unsigned int n_tables, Mmp_Hash *rbt_tables){
 	free(pkg_table_name);
 }
 
-static void 
+void 
 init_break(char *package, unsigned int threads){
 
 	if(sem_init(&sem, 0, 1) == -1){
@@ -98,7 +97,7 @@ init_break(char *package, unsigned int threads){
 	break_ctx.threads = threads;
 
 	load_rainbow_tables(package, break_ctx.tables, &break_ctx.rbt_tables);
-	reduction_init(keylen, charset_types);
+	init_reduction(keylen, charset_types);
 
 	shared.digest_ctr = 0;
 	shared.crack_ctr = 0;
@@ -107,10 +106,10 @@ init_break(char *package, unsigned int threads){
 static void 
 load_digest_file(char *file){
 
-	fhashesp = open(file,O_RDONLY,0777);
+	break_ctx.fp_digest = open(file, O_RDONLY, 0777);
 
-	if(fhashesp == NULL){
-		printf("Eror al leer el archivo.\n");
+	if(break_ctx.fp_digest == NULL){
+		printf("can't read file.\n");
 	}
 }
 
@@ -152,13 +151,14 @@ break_file(char *digest_file){
 	free(childs);
 
 
-	printf("Se ha roto %u passwords de un total de %d, lo que supone un tasa de exito del %d%\n",cracks,hashes,cracks*100/hashes);
+	printf("Se ha roto %u passwords de un total de %d, lo que supone un tasa de exito del %d%\n",
+								shared.crack_ctr, shared.digest_ctr, shared.crack_ctr*100/shared.digest_ctr);
 	
-	for(i = 0 ; i < break_ctx.threads ; i++){
-		close_hash_table3(&tables[i]);		
+	for(i = 0 ; i < break_ctx.tables ; i++){
+		close_hash_table3(&break_ctx.rbt_tables[i]);		
 	}
 
-	close(fhashesp);		
+	close(break_ctx.fp_digest);		
 }
 
 
@@ -167,36 +167,37 @@ static int
 lookup(unsigned char *searchedSha, int t){
 	
 	unsigned char sha[20];
-	char r[MAX_KEY_LENGTH+1];	
-	char plain_result[MAX_KEY_LENGTH+1];
+	char r[MAX_MKEY_LENGTH + 1];	
+	char plain_result[MAX_MKEY_LENGTH + 1];
 	unsigned long long index;
 	unsigned int i_index;
 	int k;
 
 	int i;
-	for(i = CHAIN_LENGTH-1 ; i >= 0 ; i--){	
+	for(i = break_ctx.chainlen - 1 ; i >= 0 ; i--){	
 
 		SHAcpy(sha, searchedSha);
-		index = sha2index(sha,i,t);
+		index = sha2index(sha, i, t);
 
-		for(k= i+1; k < CHAIN_LENGTH ; k++){					
+		for(k = i + 1 ; k < break_ctx.chainlen ; k++){	
+
 			index2plain(index,r);
 			SHA1(r, strlen(r), sha);
 			index = sha2index(sha,k,t);
 		}
 		
-		i_index = get3(&tables[t],index);		
+		i_index = get3(&break_ctx.rbt_tables[t], index);		
 
 		if(i_index){			// case find collision
-			search_sha(searchedSha,i_index,i,t,plain_result);
-			if(strcmp(plain_result,"")!=0){
+			search_sha(searchedSha, i_index, i, t, plain_result);
+			if(strcmp(plain_result, "") != 0){
 				sem_wait(&sem2);	// up()
 				int i;
 				for(i=0 ; i < 20 ; i++){
-					printf("%02x",searchedSha[i]);
+					printf("%02x", searchedSha[i]);
 				}
 				printf(" -> ");
-				printf("%s\n",plain_result);
+				printf("%s\n", plain_result);
 				sem_post(&sem2);	// up()
 				return 1;
 			}				
@@ -216,15 +217,16 @@ search_sha(unsigned char *searchedSha, unsigned long initWord, unsigned int max_
 	index2plain(index,r);
 
 	int j;
-	for(j = 0; j < max_ite ; sha2plain(sha,j,table,r),j++){
+	for(j = 0; j < max_ite ; sha2plain(sha, j, table, r), j++){
 		SHA1(r, strlen(r), sha);
 	}
+
 	SHA1(r, strlen(r), sha);
 	if(SHAcmp(searchedSha,sha) == 0){
 		return ;	
 	}
 
-	r[0]='\0';
+	r[0] = '\0';
 }
 
 static void *
@@ -237,18 +239,19 @@ child(void *v)
 	int j, i ;
 	sem_wait(&sem);	// down()
 
-	for(i = 0 ; read(fhashesp,sha_text,sizeof(sha_text)) ; i++){
-		hashes++;
+	for(i = 0 ; read(break_ctx.fp_digest, sha_text,sizeof(sha_text)) ; i++){
+
+		shared.digest_ctr++;
 		sem_post(&sem);	// up()
 
 		string2sha(sha_text,sha);
 
-		for(j = 0 ; j < TABLES_NUMBER ; j++){
+		for(j = 0 ; j < break_ctx.tables ; j++){
 
 			found = lookup(sha, j);
 			if(found){
 				sem_wait(&sem3);	// down()
-				cracks++;
+				shared.crack_ctr++;
 				sem_post(&sem3);	// up()
 
 				break ;	

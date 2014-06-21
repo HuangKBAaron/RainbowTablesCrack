@@ -11,7 +11,7 @@ static unsigned int reduction_length(unsigned long long index);
 
 
 void 
-init_reduction(unsigned int keylen, unsigned int *charset_types){
+init_reduction(unsigned int keylen, char *charset_types){
 
 	init_keyspace(keylen, charset_types);
 }

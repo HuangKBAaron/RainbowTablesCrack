@@ -15,40 +15,40 @@ static struct arrayset charset;
 
 
 
-static void init_charset(struct arrayset *charset, unsigned int *charset_types);
+static void init_charset(struct arrayset *charset, char *charset_types);
 
 
 
 
 static void 
-init_charset(struct arrayset *charset, unsigned int *charset_types){
+init_charset(struct arrayset *charset, char *charset_types){
 
 	char i;
 
 	charset->size = 0;
 
-	if(charset_types[MIN]){
+	if(charset_types[MIN] == MIN_CHAR){
 		for(i = 'a'; i <= 'z' ; i++){
 			charset->elements[charset->size] = i;
 			charset->size++;
 		}
 	}
 
-	if(charset_types[MAY]){
+	if(charset_types[MAY] == MAY_CHAR){
 		for(i = 'A'; i <= 'Z' ; i++){
 			charset->elements[charset->size] = i;
 			charset->size++;
 		}
 	}
 
-	if(charset_types[NUM]){
+	if(charset_types[NUM] == NUM_CHAR){
 		for(i = '0'; i <= '9' ; i++){
 			charset->elements[charset->size]= i;
 			charset->size++;
 		}
 	}
 
-	if(charset_types[SPE]){
+	if(charset_types[SPE] == SPE_CHAR){
 		charset->elements[charset->size]= '.';
 		charset->size++;
 
@@ -57,7 +57,7 @@ init_charset(struct arrayset *charset, unsigned int *charset_types){
 	}
 }
 
-void init_keyspace(unsigned int maxkeylength, unsigned int *charset_types){
+void init_keyspace(unsigned int maxkeylength, char *charset_types){
 
 	init_charset(&charset, charset_types);
 

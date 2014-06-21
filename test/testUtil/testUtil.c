@@ -11,7 +11,7 @@
 void test_util(){
 
     unsigned int keylen = 6;
-    unsigned int charset_types[4] = {1, 0, 1, 0};
+    char charset_types[5] = "a0";
     unsigned int chainlen = 10000;
     unsigned int tables = 5;
 
@@ -26,7 +26,7 @@ void test_util(){
     char *table_name = name_rbt_n(pkg_name, 8);
 
     printf("table_name is: %s\n", table_name);
-    printf("table_name should be: /path/to/package/name_6_a0_10000_5/8\n");
+    printf("table_name should be: /path/to/package/name_6_a0_10000_5/rbt_8\n");
     printf("\n");
 
 

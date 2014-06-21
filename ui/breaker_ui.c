@@ -8,18 +8,10 @@
 #include "../lib/util.h"
 
 
-// ./generate -l 6 -a -cl 1000 -t 4 -tl 10000 -ths 8
-
-/*
-Longitud: 6
-Iteraciones: 5000
-Longitud de tabla: 40000 
-Numero de tablas: 4
-*/
 
 
 void print_usage() {
-	printf("Usage: break_rbt [--version] |\n");
+	printf("Usage: rbt_break [--version] |\n");
 	printf("                 [--rbt path/to/rainbow_table_package]\n");
 	printf("                 [--file digest_file]\n");
 	printf("                 [--threads threads_number]\n");
@@ -112,12 +104,9 @@ char *argv[];
 	}		
 
 	if(! _rflag){
-		/*
-		printf("--keylen is required\n");
+		printf("--rbt is required\n");
 		print_usage();
 		return 1;
-		*/
-		_rvalue = DEFAULT_MKEY_LENGTH;
 	}
 
 	if(! _fflag){
@@ -126,7 +115,7 @@ char *argv[];
 		print_usage();	
 		return 1;
 		*/
-		_fvalue = DEFAULT_CHAIN_LENGTH;
+		_fvalue = RBT_DIGEST_FILE_DEFAULT;
 	}
 
 	if(! _Tflag){
@@ -141,6 +130,6 @@ char *argv[];
 	
 	
 
-
-
+	init_break(_rvalue, _Tvalue);
+	break_file(_fvalue);
 }

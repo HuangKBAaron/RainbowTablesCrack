@@ -3,11 +3,11 @@
 #define MIN_MKEY_LENGTH      1
 
 #define MAX_TABLE_LENGTH    1000000000
-#define DEFAULT_TABLE_LENGTH    100000
+#define DEFAULT_TABLE_LENGTH     10000
 #define MIN_TABLE_LENGTH             1
 
 #define MAX_CHAIN_LENGTH     100000
-#define DEFAULT_CHAIN_LENGTH   1000
+#define DEFAULT_CHAIN_LENGTH    100
 #define MIN_CHAIN_LENGTH          1
 
 #define MAX_TABLES    10
@@ -21,10 +21,17 @@
 #define RBT_PATH_DEFAULT "../storage/"
 #define RBT_NAME "rbt"
 
-#define MIN_CHAR "a"
-#define MAY_CHAR "A"
-#define NUM_CHAR "0"
-#define SPE_CHAR "*"
+#define RBT_DIGEST_FILE_DEFAULT "../digest_files/test"
+
+#define MIN_CHAR 'a'
+#define MAY_CHAR 'A'
+#define NUM_CHAR '0'
+#define SPE_CHAR 's'
+
+#define MIN_STR "a"
+#define MAY_STR "A"
+#define NUM_STR "0"
+#define SPE_STR "s"
 
 
 enum CharsetType {
@@ -38,5 +45,10 @@ enum CharsetType {
 
 
 void itoa(int n, char *s);
-char *name_rbt_package(unsigned int keylen, unsigned int *charset_types, unsigned int chainlen, unsigned int tables);
+
+char *name_rbt_package(unsigned int keylen, char *charset_types, unsigned int chainlen, unsigned int tables);
 char *name_rbt_n(char *package, unsigned int table);
+
+void string2sha(char *str, unsigned char *sha);
+int SHAcmp(unsigned char*sha_1, unsigned char *sha_2);
+void SHAcpy(unsigned char*sha_1, unsigned char *sha_2);

@@ -1,4 +1,4 @@
-void init_reduction(unsigned int keylen, unsigned int *charset_types);
+void init_reduction(unsigned int keylen, char *charset_types);
 
 void sha2plain(unsigned char *sha, unsigned int offset, unsigned int table, char *plain);
 void sha2plain_64(unsigned char *sha, unsigned int offset, unsigned int table, char *plain);
