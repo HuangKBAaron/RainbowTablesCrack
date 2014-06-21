@@ -110,3 +110,30 @@ name_rbt_n(char *package, unsigned int table){
 
     return toReturn;
 }
+
+
+void read_rbt_package(char *package, unsigned int *keylen, char *charset_types, unsigned int *chainlen, unsigned int *tables){
+
+    char *pch;
+    pch = strstr(package, RBT_NAME);
+
+    char *str = malloc(strlen(pch));
+
+    strcpy(str, pch);
+  
+    pch = strtok (str, "_");
+    
+    pch = strtok (NULL, "_");
+    *keylen = atoi(pch);
+
+    pch = strtok (NULL, "_");
+    strcpy(charset_types, pch);
+
+    pch = strtok (NULL, "_");
+    *chainlen = atoi(pch);      
+
+    pch = strtok (NULL, "/");
+    *tables = atoi(pch);     
+
+    free(str);
+}

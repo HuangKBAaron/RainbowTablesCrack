@@ -12,24 +12,30 @@
 #include "../lib/util.h"
 #include "../lib/hashTable3.h"
 #include "../lib/keyspace.h"
-#include "breaker.h"
+#include "break.h"
 
 
 
-static unsigned int CHAIN_LENGTH;
-static int TABLES_NUMBER;
+struct Ctx {
+	unsigned int chainlen;
+	unsigned int tables;
+	unsigned int threads;
 
-static unsigned int hashes;
-static unsigned int cracks;
+	FILE *fp_digest;
+	Mmp_Hash tables[MAX_TABLES];
+};
 
-FILE *fhashesp;
-static Mmp_Hash tables[MAX_TABLES];
+struct Shared{
+	unsigned int crack_ctr;
+	unsigned int digest_ctr;		
+};
 
+struct Ctx break_ctx;
+struct Shared shared;
 
 sem_t  sem;  /* Semaforo */
 sem_t  sem2;  /* Semaforo 2 */
 sem_t  sem3;  /* Semaforo 3 */
-
 
 
 
@@ -58,7 +64,7 @@ load_rainbow_tables(dir){
 }
 
 static void 
-init_breaker(char *dir, int threads){
+init_break(char *package, unsigned int threads){
 
 	if(sem_init(&sem, 0, 1) == -1){
 		perror( "can't init the semaphore" );
@@ -73,42 +79,23 @@ init_breaker(char *dir, int threads){
 		exit(EXIT_FAILURE);
 	}
 
-	char DELIMITER1[2] = "_";
-	const char DELIMITER2[2] = "/";
+	unsigned int keylen = 0;
+	char *charset_types = malloc(5);
 
-	THREADS_NUMBER = threads;
+	break_ctx.threads = threads;
 
-	load_rainbow_tables(dir);
+	read_rbt_package(package, &keylen, charset_types, &break_ctx.chainlen, &break_ctx.tables);
 
-	hashes = 0;
-	cracks = 0 ;
+	load_rainbow_tables(package);
 
-	int k_length;
-	char tag[5];
-	char str[80];
-	char *pch;
+	shared.digest_ctr = 0;
+	shared.crack_ctr = 0;
 
-	strcpy(str,dir);
-  
-  	pch = strtok (str, DELIMITER1);
-	
-  	pch = strtok (NULL, DELIMITER1);
-	k_length = atoi(pch);
-
-	pch = strtok (NULL, DELIMITER1);
-	strcpy(tag,pch);
-
-	pch = strtok (NULL, DELIMITER1);
-	CHAIN_LENGTH = atoi(pch);		// init chain_length
-
-	pch = strtok (NULL, DELIMITER2);
-	TABLES_NUMBER = atoi(pch);		// init num_tables
-
-	reduction_init(k_length,tag);
+	reduction_init(keylen, charset_types);
 }
 
 static void 
-load_hashes_file(char *file){
+load_digest_file(char *file){
 
 	fhashesp = open(file,O_RDONLY,0777);
 
@@ -133,7 +120,7 @@ newproc(void *(*tmain)(void *), void *args)
 }
 
 void
-break_down(char *hashes_file){
+break_file(char *hashes_file){
 	
 	load_hashes_file(hashes_file);
 
