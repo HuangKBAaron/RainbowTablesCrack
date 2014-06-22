@@ -4,8 +4,8 @@
 CC = gcc -pthread
 OBJECTS = ../devices/reduction.o ../lib/hashTable3.o ../lib/util.o ../lib/keyspace.o ../tools/generate.o 
 
-generate_rbt: generator_ui.o $(OBJECTS)
-	$(CC) -o generate_rbt generator_ui.o $(OBJECTS) -lm -lcrypto
+rbt_generate: generator_ui.o $(OBJECTS)
+	$(CC) -o rbt_generate generator_ui.o $(OBJECTS) -lm -lcrypto
 
 generator_ui.o: ../tools/generate.h ../lib/util.h
 ../lib/hashTable3.o: ../lib/hashTable3.h
@@ -18,4 +18,4 @@ generator_ui.o: ../tools/generate.h ../lib/util.h
 
 .PHONY : clean
     clean :
-	-rm generate_rbt $(OBJECTS) 
+	-rm rbt_generate $(OBJECTS) 

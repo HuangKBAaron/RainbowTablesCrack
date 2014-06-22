@@ -121,14 +121,9 @@ char *argv[];
 	if(! _Tflag){
 		_Tvalue = DEFAULT_THREADS;
 	}
-
-
 	
-	printf("rflag: %d, fflag: %d, Tflag: %d\n", _rflag, _fflag, _Tflag);
-	
-	printf("rbt: %s, file: %s, threads: %u\n", _rvalue, _fvalue, _Tvalue);
-	
-	
+	//printf("rflag: %d, fflag: %d, Tflag: %d\n", _rflag, _fflag, _Tflag);	
+	//printf("rbt: %s, file: %s, threads: %u\n", _rvalue, _fvalue, _Tvalue);	
 
 	init_break(_rvalue, _Tvalue);
 	break_file(_fvalue);

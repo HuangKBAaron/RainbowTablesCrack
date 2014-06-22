@@ -35,6 +35,7 @@ struct Shared shared;
 sem_t  sem;  /* Semaforo */
 sem_t  sem2;  /* Semaforo 2 */
 sem_t  sem3;  /* Semaforo 3 */
+sem_t  sem4;  /* Semaforo 4 */
 
 
 
@@ -89,6 +90,10 @@ init_break(char *package, unsigned int threads){
 		perror( "can't init the semaphore" );
 		exit(EXIT_FAILURE);
 	}
+	if(sem_init(&sem4, 0, 1) == -1){
+		perror( "can't init the semaphore" );
+		exit(EXIT_FAILURE);
+	}
 
 	unsigned int keylen = 0;
 	char *charset_types = malloc(5);
@@ -101,6 +106,11 @@ init_break(char *package, unsigned int threads){
 
 	shared.digest_ctr = 0;
 	shared.crack_ctr = 0;
+
+	printf("\n");
+	printf("loading rainbow tables...\n");
+	printf("RTB package: %s\n", package);
+	printf("\n");
 }
 
 static void 
@@ -132,6 +142,8 @@ void
 break_file(char *digest_file){
 	
 	load_digest_file(digest_file);
+	printf("digest file -> %s\n", digest_file);
+	printf("cracking passwords...\n");
 
 	pthread_t  *childs;
 	childs = malloc(break_ctx.threads * sizeof(pthread_t));
@@ -149,16 +161,16 @@ break_file(char *digest_file){
 	for(i= 0; i <  break_ctx.threads; i++)
 		pthread_join(childs[i], NULL);
 	free(childs);
-
-
-	printf("Se ha roto %u passwords de un total de %d, lo que supone un tasa de exito del %d%\n",
-								shared.crack_ctr, shared.digest_ctr, shared.crack_ctr*100/shared.digest_ctr);
 	
 	for(i = 0 ; i < break_ctx.tables ; i++){
 		close_hash_table3(&break_ctx.rbt_tables[i]);		
 	}
 
 	close(break_ctx.fp_digest);		
+
+	printf("\n");
+	printf("Se ha roto %u passwords de un total de %d, lo que supone un tasa de exito del %d%\n",
+								shared.crack_ctr, shared.digest_ctr, shared.crack_ctr*100/shared.digest_ctr);
 }
 
 
@@ -181,16 +193,18 @@ lookup(unsigned char *searchedSha, int t){
 
 		for(k = i + 1 ; k < break_ctx.chainlen ; k++){	
 
-			index2plain(index,r);
+			index2plain(index, r);
 			SHA1(r, strlen(r), sha);
-			index = sha2index(sha,k,t);
+			index = sha2index(sha, k, t);
 		}
 		
 		i_index = get3(&break_ctx.rbt_tables[t], index);		
 
 		if(i_index){			// case find collision
+
 			search_sha(searchedSha, i_index, i, t, plain_result);
 			if(strcmp(plain_result, "") != 0){
+
 				sem_wait(&sem2);	// up()
 				int i;
 				for(i=0 ; i < 20 ; i++){
@@ -199,6 +213,7 @@ lookup(unsigned char *searchedSha, int t){
 				printf(" -> ");
 				printf("%s\n", plain_result);
 				sem_post(&sem2);	// up()
+
 				return 1;
 			}				
 		}
@@ -222,7 +237,7 @@ search_sha(unsigned char *searchedSha, unsigned long initWord, unsigned int max_
 	}
 
 	SHA1(r, strlen(r), sha);
-	if(SHAcmp(searchedSha,sha) == 0){
+	if(SHAcmp(searchedSha, sha) == 0){
 		return ;	
 	}
 
@@ -239,12 +254,12 @@ child(void *v)
 	int j, i ;
 	sem_wait(&sem);	// down()
 
-	for(i = 0 ; read(break_ctx.fp_digest, sha_text,sizeof(sha_text)) ; i++){
+	for(i = 0 ; read(break_ctx.fp_digest, sha_text, sizeof(sha_text)) ; i++){
 
 		shared.digest_ctr++;
 		sem_post(&sem);	// up()
 
-		string2sha(sha_text,sha);
+		string2sha(sha_text, sha);
 
 		for(j = 0 ; j < break_ctx.tables ; j++){
 
@@ -259,7 +274,11 @@ child(void *v)
 		}
 		if(!found){
 			sem_wait(&sem2);	// down()
-			printf("not found\n");	
+			int i;
+			for(i=0 ; i < 20 ; i++){
+				printf("%02x", sha[i]);
+			}
+			printf(" (not found)\n");	
 			sem_post(&sem2);	// up()
 		}
 

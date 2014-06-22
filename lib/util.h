@@ -1,5 +1,5 @@
 #define MAX_MKEY_LENGTH     14
-#define DEFAULT_MKEY_LENGTH  8
+#define DEFAULT_MKEY_LENGTH  5
 #define MIN_MKEY_LENGTH      1
 
 #define MAX_TABLE_LENGTH    1000000000
@@ -7,7 +7,7 @@
 #define MIN_TABLE_LENGTH             1
 
 #define MAX_CHAIN_LENGTH     100000
-#define DEFAULT_CHAIN_LENGTH    100
+#define DEFAULT_CHAIN_LENGTH    500
 #define MIN_CHAIN_LENGTH          1
 
 #define MAX_TABLES    10
@@ -22,6 +22,8 @@
 #define RBT_NAME "rbt"
 
 #define RBT_DIGEST_FILE_DEFAULT "../digest_files/test"
+
+#define CHARSET_DEFAULT "a"
 
 #define MIN_CHAR 'a'
 #define MAY_CHAR 'A'

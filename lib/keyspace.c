@@ -27,28 +27,28 @@ init_charset(struct arrayset *charset, char *charset_types){
 
 	charset->size = 0;
 
-	if(charset_types[MIN] == MIN_CHAR){
+	if(strchr(charset_types, MIN_CHAR) != NULL){
 		for(i = 'a'; i <= 'z' ; i++){
 			charset->elements[charset->size] = i;
 			charset->size++;
 		}
 	}
 
-	if(charset_types[MAY] == MAY_CHAR){
+	if(strchr(charset_types, MAY_CHAR) != NULL){
 		for(i = 'A'; i <= 'Z' ; i++){
 			charset->elements[charset->size] = i;
 			charset->size++;
 		}
 	}
 
-	if(charset_types[NUM] == NUM_CHAR){
+	if(strchr(charset_types, NUM_CHAR) != NULL){
 		for(i = '0'; i <= '9' ; i++){
 			charset->elements[charset->size]= i;
 			charset->size++;
 		}
 	}
 
-	if(charset_types[SPE] == SPE_CHAR){
+	if(strchr(charset_types, SPE_CHAR) != NULL){
 		charset->elements[charset->size]= '.';
 		charset->size++;
 

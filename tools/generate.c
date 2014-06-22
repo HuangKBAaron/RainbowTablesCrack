@@ -80,6 +80,12 @@ init_rbt(unsigned int keylen, char *charset_types,
 
 	shared.collision_ctr = 0;
 	shared.index_ctr = 0;
+
+	printf("\n");
+	printf("Key lenth: %u | Charset: %s | Chain length: %u | Table length: %u | Tables: %u | Threads: %u\n", 
+		generate_ctx.keylen, charset_types, generate_ctx.chainlen, generate_ctx.tablelen, generate_ctx.tables, generate_ctx.threads);
+	printf("RBT Package -> %s\n", generate_ctx.rbt_package);
+	printf("\n");
 }
 
 
@@ -134,13 +140,11 @@ generate_table(unsigned int n_table)
 {
 	shared.current_table =  n_table;
 	shared.genchain_ctr = 0 ;
+	unsigned long long before_collision_ctr = shared.collision_ctr;
 
 	char *table_name = name_rbt_n(generate_ctx.rbt_package, n_table);
 
 	create_hash_table3(&(shared.hash_table), table_name);
-	
-	free(table_name);
-	table_name = NULL;
 
 	pthread_t  *childs;
 	childs = malloc(generate_ctx.threads * sizeof(pthread_t));
@@ -161,7 +165,9 @@ generate_table(unsigned int n_table)
 
 	close_hash_table3(&(shared.hash_table));
 
-	printf("Colisiones: %llu\n", shared.collision_ctr);
+	printf("Table %u generated successfully | discarded chains: %llu\n", n_table, shared.collision_ctr - before_collision_ctr);
+
+	free(table_name);
 }
 
 static unsigned long long
@@ -187,10 +193,15 @@ generate_chain(unsigned int init_point, unsigned int table)
 void 
 generate_rbt()
 {
+
+	printf("generating rainbow tables...\n");
+
 	unsigned int i ;
 	for(i = 0 ; i < generate_ctx.tables ; i++){
 		generate_table(i);
 	}
+
+	printf("Total discarded chains: %llu\n", shared.collision_ctr);
 }
 
 

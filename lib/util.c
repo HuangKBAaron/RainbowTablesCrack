@@ -43,8 +43,9 @@ void string2sha(char *str, unsigned char *sha){
     unsigned char hex[3];
     int i;
     for(i=0 ; i < 20 ; i++){
-        strncpy(hex,&str[i*2],2);   
-        sscanf(hex,"%x",&sha[i]);
+        strncpy(hex, &str[i*2], 2); 
+        hex[2] = '\0';  
+        sscanf(hex, "%x", &sha[i]);
     }
 }
 
