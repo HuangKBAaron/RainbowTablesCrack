@@ -1,4 +1,4 @@
-RainbowTablesCrack
+Rainbow Tables Crack
 ==================
 
 Rainbow tables generator and digest crack.
@@ -16,13 +16,13 @@ Compilar el generador de Rainbow Tables
 ```
 make -f makefile_generator
 ```
-Compilar el cracker de contraseñas
+Compilar el crack de contraseñas
 ```
 make -f makefile_breaker
 ```
 
 
-Generator
+Generator tool
 ---------
 ```
 Usage: rbt_generate [--version] |
@@ -34,7 +34,7 @@ Usage: rbt_generate [--version] |
                     [--th threads_number]
 ```
 
-Cracker
+Crack tool
 -------
 ```
 Usage: rbt_break [--version] |
