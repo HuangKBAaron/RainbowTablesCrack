@@ -8,10 +8,14 @@ Rainbow tables generator and digest crack.
 Install
 -------
 
+'''
 cd ui/
+'''
+'''
 make -f makefile_generator
+'''
 make -f makefile_breaker
-
+'''
 
 
 generator
