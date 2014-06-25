@@ -22,7 +22,7 @@ make -f makefile_breaker
 ```
 
 
-generator
+Generator
 ---------
 ```
 Usage: rbt_generate [--version] |
@@ -34,7 +34,7 @@ Usage: rbt_generate [--version] |
                     [--th threads_number]
 ```
 
-cracker
+Cracker
 -------
 ```
 Usage: rbt_break [--version] |
