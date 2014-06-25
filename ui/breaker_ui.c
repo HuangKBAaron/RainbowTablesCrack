@@ -14,7 +14,7 @@ void print_usage() {
 	printf("Usage: rbt_break [--version] |\n");
 	printf("                 [--rbt path/to/rainbow_table_package]\n");
 	printf("                 [--file digest_file]\n");
-	printf("                 [--threads threads_number]\n");
+	printf("                 [--th threads_number]\n");
 }
 
 void print_version() {
@@ -49,7 +49,7 @@ char *argv[];
 			{"help",      no_argument,       0, 'h'},
 			{"rbt",       required_argument, 0, 'r'},
 			{"file",      required_argument, 0, 'f'},
-			{"threads",   required_argument, 0, 'T'},
+			{"th",        required_argument, 0, 'T'},
 			{0, 0, 0, 0}
 		};
 
