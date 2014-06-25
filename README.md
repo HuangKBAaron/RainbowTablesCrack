@@ -16,7 +16,7 @@ Compilar el generador de Rainbow Tables
 ```
 make -f makefile_generator
 ```
-Compilar el cracker de ficheros de contraseñas
+Compilar el cracker de contraseñas
 ```
 make -f makefile_breaker
 ```
