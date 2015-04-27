@@ -1,21 +1,41 @@
 #include "x_rainbow_crack.h"
 
 
+
+
+
+void print_usage() {
+    printf("%s\n", X_RAINBOW_CRACK_USAGE);
+}
+
+void print_version() {
+    printf("%s\n", "xrainbow_crack_1.0");
+}
+
+
 int main (argc, argv)
         int argc;
         char *argv[];
 {
     char *ptr;
 
-    int _vflag = 0;
-    int _hflag = 0;
-    int _rflag = 0;
-    int _fflag = 0;
-    int _Tflag = 0;
-    char *_rvalue = NULL;
-    char * _fvalue = NULL;
-    unsigned int _Tvalue = 0;
-
+    int vflag = 0;
+    int hflag = 0;
+    int gflag = 0;
+    char *mvalue = NULL;
+    char *svalue = NULL;
+    char *cvalue = NULL;
+    char *lvalue = NULL;
+    char *nvalue = NULL;
+    char *rvalue = NULL;
+    char *fvalue = NULL;
+    char *tvalue = NULL;
+    int maxlen = 0;
+    int keyset = 0;
+    int chainlen = 0;
+    int tablelen = 0;
+    int ntables = 0;
+    int nthreads = 0;
 
     int opt = 0;
     /* getopt_long stores the option index here. */
@@ -26,8 +46,7 @@ int main (argc, argv)
                     {"version",        no_argument,       0, 'v'},
                     {"help",           no_argument,       0, 'h'},
                     {"generate",       no_argument,       0, 'g'},
-                    {"maxlen",         required_argument, 0, 'M'},
-                    {"minlen",         required_argument, 0, 'm'},
+                    {"maxlen",         required_argument, 0, 'm'},
                     {"keyset",         required_argument, 0, 's'},
                     {"chainlen",       required_argument, 0, 'c'},
                     {"tablelen",       required_argument, 0, 'l'},
@@ -38,31 +57,52 @@ int main (argc, argv)
                     {0, 0, 0, 0}
             };
 
-    while((opt = getopt_long(argc, argv, ":vhgM:m:s:c:l:n:r:f:t:", long_options, &option_index)) != -1){
+    while((opt = getopt_long(argc, argv, ":vhgm:s:c:l:n:r:f:t:", long_options, &option_index)) != -1){
 
         switch(opt){
 
             case 'v':
-                _vflag = 1;
+                vflag = 1;
                 break;
 
             case 'h':
-                _hflag = 1;
+                hflag = 1;
+                break;
+
+            case 'g':
+                gflag = 1;
+                break;
+
+            case 'm':
+                mvalue = optarg;
+                break;
+
+            case 's':
+                svalue = optarg;
+                break;
+
+            case 'c':
+                cvalue = optarg;
+                break;
+
+            case 'l':
+                lvalue = optarg;
+                break;
+
+            case 'n':
+                nvalue = optarg;
                 break;
 
             case 'r':
-                _rflag = 1;
-                _rvalue = optarg;
+                rvalue = optarg;
                 break;
 
             case 'f':
-                _fflag = 1;
-                _fvalue = optarg;
+                fvalue = optarg;
                 break;
 
-            case 'T':
-                _Tflag = 1;
-                _Tvalue = strtoul(optarg, &ptr, 10);
+            case 't':
+                tvalue = optarg;
                 break;
 
             case ':':   /* missing option argument */
@@ -78,38 +118,29 @@ int main (argc, argv)
         }
     }
 
-    if(_vflag){
+    if(vflag){
         print_version();
         return 0;
     }
 
-    if(_hflag){
+    if(hflag){
         print_usage();
         return 0;
     }
 
-    if(! _rflag){
-        printf("--rbt is required\n");
+    if(tvalue != NULL){
+        nthreads = DEFAULT_THREADS;
+    } else {
+        nthreads = DEFAULT_THREADS;
+    }
+
+    if( gflag  &&  mvalue != NULL  &&  svalue != NULL  &&  cvalue != NULL  &&  lvalue != NULL  &&  nvalue != NULL ){
+
+    } else if ( rvalue != NULL  &&  fvalue != NULL ) {
+        init_break(rvalue, nthreads);
+        break_file(fvalue);
+    } else {
         print_usage();
-        return 1;
     }
 
-    if(! _fflag){
-        /*
-        printf("--chainlen is required\n");
-        print_usage();
-        return 1;
-        */
-        _fvalue = RBT_DIGEST_FILE_DEFAULT;
-    }
-
-    if(! _Tflag){
-        _Tvalue = DEFAULT_THREADS;
-    }
-
-    //printf("rflag: %d, fflag: %d, Tflag: %d\n", _rflag, _fflag, _Tflag);
-    //printf("rbt: %s, file: %s, threads: %u\n", _rvalue, _fvalue, _Tvalue);
-
-    init_break(_rvalue, _Tvalue);
-    break_file(_fvalue);
 }

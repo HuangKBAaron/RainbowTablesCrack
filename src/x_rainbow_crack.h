@@ -20,3 +20,5 @@
                               "                      -t threads\n"\
                               "\n"\
                               "                      [--version]\n"
+
+#define DEFAULT_THREADS 8
