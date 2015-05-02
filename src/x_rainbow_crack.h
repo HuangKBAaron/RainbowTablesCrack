@@ -1,5 +1,3 @@
-#include "config.h"
-
 #ifndef RAINBOWTABLESCRACK_X_RAINBOW_CRACK_H
 #define RAINBOWTABLESCRACK_X_RAINBOW_CRACK_H
 
@@ -22,3 +20,8 @@
                               "                      [--version]\n"
 
 #define DEFAULT_THREADS 8
+
+#define NUMERIC_KEYSET_CODE 'n'
+#define LOWERALPHA_KEYSET_CODE 'l'
+#define UPPERALPHA_KEYSET_CODE 'u'
+#define SPECIALCHARS_KEYSET_CODE 's'

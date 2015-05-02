@@ -1,6 +1,10 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <getopt.h>
+
 #include "x_rainbow_crack.h"
-
-
+#include "charset.h"
 
 
 
@@ -12,6 +16,27 @@ void print_version() {
     printf("%s\n", "xrainbow_crack_1.0");
 }
 
+unsigned int clean_int(char *arg) {
+    return (unsigned int)atoi(arg);
+}
+
+unsigned int clean_keyset(char *arg) {
+    unsigned int val;
+    val = clean_int(arg);
+    if (val > 0)
+        return val;
+
+    val = 0;
+    if (strchr(arg, NUMERIC_KEYSET_CODE))
+        val += NUMERIC;
+    if (strchr(arg, LOWERALPHA_KEYSET_CODE))
+        val += LOWERALPHA;
+    if (strchr(arg, UPPERALPHA_KEYSET_CODE))
+        val += UPPERALPHA;
+    if (strchr(arg, SPECIALCHARS_KEYSET_CODE))
+        val += SPECIALCHARS;
+    return val;
+}
 
 int main (argc, argv)
         int argc;
@@ -30,12 +55,12 @@ int main (argc, argv)
     char *rvalue = NULL;
     char *fvalue = NULL;
     char *tvalue = NULL;
-    int maxlen = 0;
-    int keyset = 0;
-    int chainlen = 0;
-    int tablelen = 0;
-    int ntables = 0;
-    int nthreads = 0;
+    unsigned int maxlen = 0;
+    unsigned int keyset = 0;
+    unsigned int chainlen = 0;
+    unsigned int tablelen = 0;
+    unsigned int ntables = 0;
+    unsigned int nthreads = 0;
 
     int opt = 0;
     /* getopt_long stores the option index here. */
@@ -134,11 +159,23 @@ int main (argc, argv)
         nthreads = DEFAULT_THREADS;
     }
 
-    if( gflag  &&  mvalue != NULL  &&  svalue != NULL  &&  cvalue != NULL  &&  lvalue != NULL  &&  nvalue != NULL ){
+    maxlen = clean_int(mvalue);
+    keyset = clean_keyset(svalue);
+    chainlen = clean_int(cvalue);
+    tablelen = clean_int(lvalue);
+    ntables = clean_int(nvalue);
+    nthreads = clean_int(tvalue);
 
+    if(nthreads <= 0){
+        nthreads = DEFAULT_THREADS;
+    }
+
+    if( gflag  &&  maxlen > 0  &&  keyset > 0  &&  chainlen > 0  &&  tablelen > 0  &&  ntables > 0 ){
+        //init_generate_rbt(_kvalue, &_charset, _cvalue, _lvalue, _tvalue, _Tvalue);
+        //generate_rbt();
     } else if ( rvalue != NULL  &&  fvalue != NULL ) {
-        init_break(rvalue, nthreads);
-        break_file(fvalue);
+        //init_break(rvalue, nthreads);
+        //break_file(fvalue);
     } else {
         print_usage();
     }
