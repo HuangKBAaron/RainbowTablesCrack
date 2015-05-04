@@ -38,9 +38,7 @@ unsigned int clean_keyset(char *arg) {
     return val;
 }
 
-int main (argc, argv)
-        int argc;
-        char *argv[];
+int main (int argc, char *argv[])
 {
     char *ptr;
 
@@ -141,6 +139,11 @@ int main (argc, argv)
                 print_usage();
                 return 1;
         }
+    }
+
+    if(argc < 2){
+        print_usage();
+        return 1;
     }
 
     if(vflag){

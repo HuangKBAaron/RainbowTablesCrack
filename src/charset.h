@@ -1,7 +1,3 @@
-//
-// Created by ivanprjcts on 2/05/15.
-//
-
 #ifndef RAINBOWTABLESCRACK_CHARSET_H
 #define RAINBOWTABLESCRACK_CHARSET_H
 
