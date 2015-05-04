@@ -21,3 +21,5 @@
 
 # Python files
 *.pyc
+test/integration_test/.idea/*
+.idea/*
