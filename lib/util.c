@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
 #include "util.h"
 
 
@@ -67,40 +68,13 @@ void SHAcpy(unsigned char*sha_1, unsigned char *sha_2){
 }
 
 char * 
-name_rbt_package(unsigned int keylen, char *charset_types, unsigned int chainlen, unsigned int tables){
+name_rbt_package(unsigned int maxlen, unsigned int charset, unsigned int chainlen, unsigned int ntables){
 
-    char keylen_str[11];
-    char chainlen_str[11];
-    char tables_str[11];
+    char *toReturn = NULL;
 
-    itoa(keylen, keylen_str);
-    itoa(chainlen, chainlen_str);
-    itoa(tables, tables_str);
-
-    unsigned int pathlen = strlen(RBT_PATH_DEFAULT);
-    unsigned int namelen = strlen(RBT_NAME);
-    unsigned int keylen_strlen = strlen(keylen_str);
-    unsigned int charset_strlen = strlen(charset_types);
-    unsigned int chainlen_strlen = strlen(chainlen_str);
-    unsigned int tables_strlen = strlen(tables_str);
-
-    unsigned int toReturnlen = pathlen + namelen + keylen_strlen + charset_strlen + chainlen_strlen + tables_strlen + 5;
-
-    char *toReturn = malloc(toReturnlen + 1);
-
-    strncpy(toReturn, RBT_PATH_DEFAULT, pathlen);
-    strncat(toReturn, RBT_NAME, namelen);
-    strncat(toReturn, "_", 1);
-    strncat(toReturn, keylen_str, keylen_strlen);
-    strncat(toReturn, "_", 1);
-    strncat(toReturn, charset_types, charset_strlen);
-    strncat(toReturn, "_", 1);
-    strncat(toReturn, chainlen_str, chainlen_strlen);
-    strncat(toReturn, "_", 1);
-    strncat(toReturn, tables_str, tables_strlen);
-    strncat(toReturn, "/", 1);
-
-    toReturn[toReturnlen] = '\0';
+    toReturn = malloc(BUF_SIZE);
+    memset(toReturn, '\0', BUF_SIZE);
+    sprintf(toReturn, "%s%s_%u_%u_%u_%u/", RBT_PATH_DEFAULT, RBT_NAME, maxlen, charset, chainlen, ntables);
 
     return toReturn;
 }
@@ -131,7 +105,7 @@ name_rbt_n(char *package, unsigned int table){
 }
 
 
-void read_rbt_package(char *package, unsigned int *keylen, char *charset_types, unsigned int *chainlen, unsigned int *tables){
+void read_rbt_package(char *package, unsigned int *maxlen, char *charset_types, unsigned int *chainlen, unsigned int *tables){
 
     char *pch;
     pch = strstr(package, RBT_NAME);
@@ -143,7 +117,7 @@ void read_rbt_package(char *package, unsigned int *keylen, char *charset_types, 
     pch = strtok (str, "_");
     
     pch = strtok (NULL, "_");
-    *keylen = atoi(pch);
+    *maxlen = atoi(pch);
 
     pch = strtok (NULL, "_");
     strcpy(charset_types, pch);

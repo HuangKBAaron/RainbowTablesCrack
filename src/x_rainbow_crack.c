@@ -4,7 +4,9 @@
 #include <getopt.h>
 
 #include "x_rainbow_crack.h"
+
 #include "charset.h"
+#include "util.h"
 
 
 
@@ -17,23 +19,29 @@ void print_version() {
 }
 
 unsigned int clean_int(char *arg) {
-    return (unsigned int)atoi(arg);
+    if (arg != NULL) {
+        return (unsigned int)atoi(arg);
+    }
+    return 0;
 }
 
-unsigned int clean_keyset(char *arg) {
+unsigned int clean_charset(char *arg) {
+    if (arg == NULL)
+        return 0;
+
     unsigned int val;
     val = clean_int(arg);
     if (val > 0)
         return val;
 
     val = 0;
-    if (strchr(arg, NUMERIC_KEYSET_CODE))
+    if (strchr(arg, NUMERIC_CHARSET_CODE))
         val += NUMERIC;
-    if (strchr(arg, LOWERALPHA_KEYSET_CODE))
+    if (strchr(arg, LOWERALPHA_CHARSET_CODE))
         val += LOWERALPHA;
-    if (strchr(arg, UPPERALPHA_KEYSET_CODE))
+    if (strchr(arg, UPPERALPHA_CHARSET_CODE))
         val += UPPERALPHA;
-    if (strchr(arg, SPECIALCHARS_KEYSET_CODE))
+    if (strchr(arg, SPECIAL_CHARSET_CODE))
         val += SPECIALCHARS;
     return val;
 }
@@ -54,7 +62,7 @@ int main (int argc, char *argv[])
     char *fvalue = NULL;
     char *tvalue = NULL;
     unsigned int maxlen = 0;
-    unsigned int keyset = 0;
+    unsigned int charset = 0;
     unsigned int chainlen = 0;
     unsigned int tablelen = 0;
     unsigned int ntables = 0;
@@ -70,7 +78,7 @@ int main (int argc, char *argv[])
                     {"help",           no_argument,       0, 'h'},
                     {"generate",       no_argument,       0, 'g'},
                     {"maxlen",         required_argument, 0, 'm'},
-                    {"keyset",         required_argument, 0, 's'},
+                    {"charset",         required_argument, 0, 's'},
                     {"chainlen",       required_argument, 0, 'c'},
                     {"tablelen",       required_argument, 0, 'l'},
                     {"tables",         required_argument, 0, 'n'},
@@ -163,7 +171,7 @@ int main (int argc, char *argv[])
     }
 
     maxlen = clean_int(mvalue);
-    keyset = clean_keyset(svalue);
+    charset = clean_charset(svalue);
     chainlen = clean_int(cvalue);
     tablelen = clean_int(lvalue);
     ntables = clean_int(nvalue);
@@ -173,10 +181,18 @@ int main (int argc, char *argv[])
         nthreads = DEFAULT_THREADS;
     }
 
-    if( gflag  &&  maxlen > 0  &&  keyset > 0  &&  chainlen > 0  &&  tablelen > 0  &&  ntables > 0 ){
-        //init_generate_rbt(_kvalue, &_charset, _cvalue, _lvalue, _tvalue, _Tvalue);
+    if( gflag  &&  maxlen > 0  &&  charset > 0  &&  chainlen > 0  &&  tablelen > 0  &&  ntables > 0 ){
+        /*
+        printf("gflag: %d\nmaxlen: %u\ncharset: %u\nchainlen: %u\ntablelen: %u\n"
+                       "ntables: %u\n", gflag, maxlen, charset, chainlen, tablelen, ntables);
+                       */
+
+        init_generate_rbt(maxlen, charset, chainlen, tablelen, ntables, nthreads);
         //generate_rbt();
     } else if ( rvalue != NULL  &&  fvalue != NULL ) {
+        /*
+        printf("rvalue: %s\nfvalue: %s\n", rvalue, fvalue);
+         */
         //init_break(rvalue, nthreads);
         //break_file(fvalue);
     } else {

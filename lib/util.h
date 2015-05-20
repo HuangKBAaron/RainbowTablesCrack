@@ -35,6 +35,7 @@
 #define NUM_STR "0"
 #define SPE_STR "s"
 
+#define BUF_SIZE 1024
 
 enum CharsetType {
 	MIN,
@@ -48,7 +49,7 @@ enum CharsetType {
 
 void itoa(int n, char *s);
 
-char *name_rbt_package(unsigned int keylen, char *charset_types, unsigned int chainlen, unsigned int tables);
+char *name_rbt_package(unsigned int maxlen, unsigned int charset, unsigned int chainlen, unsigned int ntables);
 char *name_rbt_n(char *package, unsigned int table);
 
 void string2sha(char *str, unsigned char *sha);

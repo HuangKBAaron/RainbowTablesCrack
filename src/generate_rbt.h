@@ -1,3 +1,3 @@
-void init_generate_rbt(unsigned int keylen, int charset, unsigned int tablelen, unsigned int chainlen,
-                       unsigned int tables, unsigned int threads);
-void generate_rbt();
+void init_generate_rbt(unsigned int maxlen, unsigned int charset, unsigned int chainlen, unsigned int tablelen,
+                       unsigned int ntables, unsigned int nthreads);
+//void generate_rbt();

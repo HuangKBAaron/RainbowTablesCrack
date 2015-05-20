@@ -9,7 +9,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h>
-#include "hashTable3.h"
+
+#include "hashTable.h"
 
 enum { PERMS = 0660 };
 

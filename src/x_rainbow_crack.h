@@ -7,9 +7,8 @@
 
 
 #define X_RAINBOW_CRACK_USAGE "Usage: xrainbow_crack -g\n"\
-                              "                      -M MAX_PASSWORD_LENGTH\n"\
-                              "                      -m MIN_PASSWORD_LENGTH\n"\
-                              "                      -s KEYSET\n"\
+                              "                      -m MAX_PASSWORD_LENGTH\n"\
+                              "                      -s CHARSET\n"\
                               "                      -c CHAIN_LENGTH\n"\
                               "                      -l TABLE_LENGTH\n"\
                               "                      -n TABLES_NUMBER\n"\
@@ -21,7 +20,7 @@
 
 #define DEFAULT_THREADS 8
 
-#define NUMERIC_KEYSET_CODE 'n'
-#define LOWERALPHA_KEYSET_CODE 'l'
-#define UPPERALPHA_KEYSET_CODE 'u'
-#define SPECIALCHARS_KEYSET_CODE 's'
+#define NUMERIC_CHARSET_CODE 'n'
+#define LOWERALPHA_CHARSET_CODE 'l'
+#define UPPERALPHA_CHARSET_CODE 'u'
+#define SPECIAL_CHARSET_CODE 's'

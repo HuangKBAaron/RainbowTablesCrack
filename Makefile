@@ -1,20 +1,27 @@
-CC = gcc -pthread
-OBJECTS = src/charset.o
+CC := gcc
+RM := rm
+ROOT_DIR := .
+LIB_DIR := $(ROOT_DIR)/lib
+SRC_DIR := $(ROOT_DIR)/src
 
-xrainbow_crack: src/x_rainbow_crack.o $(OBJECTS)
-	$(CC) -o xrainbow_crack src/x_rainbow_crack.o $(OBJECTS) -lm
+SRCEXT := c
+BUILDEXT := o
 
-x_rainbow_crack.o: src/x_rainbow_crack.h src/charset.h
-src/charset.o: src/charset.h
+SOURCES := $(shell find . -type f -name "*.$(SRCEXT)")
+OBJECTS := $(patsubst %.$(SRCEXT),%.$(BUILDEXT),$(SOURCES))
+TARGET := xrainbow_crack
 
+CFLAGS += -g -Wall -I$(LIB_DIR) -I$(SRC_DIR) -I$(ROOT_DIR)
+LDFLAGS += -pthread
 
+all: ${TARGET}
 
-install:
-	mv xrainbow_crack /usr/bin/
+$(TARGET): $(OBJECTS)
+	@echo " $(CC) -o $@ $(OBJECTS) $(LDFLAGS)"; $(CC) -o $@ $(OBJECTS) $(LDFLAGS)
 
-uninstall:
-	rm /usr/bin/xrainbow_crack
-	rm $(OBJECTS)
+.c.o:
+	@echo " $(CC) -c $(CFLAGS) -o $@ $<"; $(CC) -c $(CFLAGS) -o $@ $<
 
 clean:
-	-rm xrainbow_crack $(OBJECTS)
+	@echo " Cleaning...";
+	@echo " $(RM) -rf $(OBJECTS) $(TARGET)"; $(RM) -rf $(OBJECTS) $(TARGET)
