@@ -14,7 +14,7 @@ TARGET := xrainbow_crack
 INSTALL_PATH := /usr/bin/
 
 CFLAGS += -g -Wall -DDEBUG -I$(LIB_DIR) -I$(SRC_DIR) -I$(ROOT_DIR)
-LDFLAGS += -pthread
+LDFLAGS += -pthread -lm -lcrypto
 
 all: ${TARGET}
 

@@ -44,6 +44,14 @@ sem_t  *sem2;
 
 
 
+
+static void generate_table(unsigned int n_table);
+static unsigned long long generate_chain(unsigned int init_point, unsigned int table);
+static void *child(void *v);
+
+
+
+
 void 
 init_generate_rbt(unsigned int maxlen, unsigned int charset, unsigned int chainlen, unsigned int tablelen, 
                   unsigned int ntables, unsigned int nthreads) {
@@ -86,3 +94,116 @@ init_generate_rbt(unsigned int maxlen, unsigned int charset, unsigned int chainl
 }
 
 
+static pthread_t
+newproc(void *(*tmain)(void *), void *args)
+{
+    pthread_t thread;
+    pthread_attr_t attr;
+
+    pthread_attr_init(&attr);
+    pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
+    if(pthread_create(&thread, &attr, tmain, args)){
+        fprintf(stderr, "Can't create pthread\n");
+        exit(EXIT_FAILURE);
+    }
+    return thread;
+}
+
+static void *
+child(void *v)
+{
+    unsigned int init_point;
+    unsigned long long end_point;
+
+    sem_wait(sem);
+    while(shared.genchain_ctr < generate_ctx.tablelen){
+        sem_post(sem);
+
+        sem_wait(sem2);
+        shared.index_ctr++;
+        init_point = shared.index_ctr;
+        sem_post(sem2);
+
+        end_point = generate_chain(init_point, shared.current_table);
+
+        sem_wait(sem);
+        if(get(&(shared.hash_table), end_point)){
+            shared.collision_ctr++;
+        }else{
+            put(&(shared.hash_table), end_point, init_point);
+            shared.genchain_ctr++;
+        }
+    }
+    sem_post(sem);
+
+    pthread_exit(0);
+}
+
+static void
+generate_table(unsigned int n_table)
+{
+    shared.current_table =  n_table;
+    shared.genchain_ctr = 0 ;
+    unsigned long long before_collision_ctr = shared.collision_ctr;
+
+    char *table_name = name_rbt_n(generate_ctx.rbt_package, n_table);
+
+    create_hash_table(&(shared.hash_table), table_name);
+
+    pthread_t  *childs;
+    childs = malloc(generate_ctx.nthreads * sizeof(pthread_t));
+
+    /*
+     * crea todos los threads
+     */
+    int i;
+    for(i = 0; i < generate_ctx.nthreads ; i++){
+        childs[i] = newproc(child, NULL);
+    }
+    /*
+     * espera a que acaben todos los threads
+     */
+    for(i= 0; i <  generate_ctx.nthreads; i++)
+        pthread_join(childs[i], NULL);
+    free(childs);
+
+    close_hash_table(&(shared.hash_table));
+
+    printf("Table %u generated successfully | discarded chains: %llu\n", n_table, shared.collision_ctr - before_collision_ctr);
+
+    free(table_name);
+}
+
+static unsigned long long
+generate_chain(unsigned int init_point, unsigned int table)
+{
+    char *r = malloc(generate_ctx.maxlen + 1);
+    unsigned char sha[20];
+
+    unsigned long long index;
+    index = init_point;
+
+    unsigned int i;
+    for(i = 0; i < generate_ctx.chainlen ; i++){
+        index2plain(index, r);
+        SHA1(r, strlen(r), sha);
+        index = sha2index(sha, i, table);
+    }
+    free(r);
+
+    return index;
+}
+
+void
+generate_rbt()
+{
+
+    printf("generating rainbow tables ...\n");
+
+    unsigned int i ;
+    for(i = 0 ; i < generate_ctx.ntables ; i++) {
+        generate_table(i);
+    }
+
+    printf("Total discarded chains: %llu\n", shared.collision_ctr);
+}

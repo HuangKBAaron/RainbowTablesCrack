@@ -189,9 +189,8 @@ int main (int argc, char *argv[])
 
 #endif
 
-
         init_generate_rbt(maxlen, charset, chainlen, tablelen, ntables, nthreads);
-        //generate_rbt();
+        generate_rbt();
     } else if ( rvalue != NULL  &&  fvalue != NULL ) {
         /*
         printf("rvalue: %s\nfvalue: %s\n", rvalue, fvalue);
