@@ -5,6 +5,7 @@
 
 #include "x_rainbow_crack.h"
 
+#include "generate_rbt.h"
 #include "charset.h"
 #include "util.h"
 
@@ -48,8 +49,6 @@ unsigned int clean_charset(char *arg) {
 
 int main (int argc, char *argv[])
 {
-    char *ptr;
-
     int vflag = 0;
     int hflag = 0;
     int gflag = 0;
@@ -181,11 +180,15 @@ int main (int argc, char *argv[])
         nthreads = DEFAULT_THREADS;
     }
 
-    if( gflag  &&  maxlen > 0  &&  charset > 0  &&  chainlen > 0  &&  tablelen > 0  &&  ntables > 0 ){
-        /*
-        printf("gflag: %d\nmaxlen: %u\ncharset: %u\nchainlen: %u\ntablelen: %u\n"
-                       "ntables: %u\n", gflag, maxlen, charset, chainlen, tablelen, ntables);
-                       */
+    if( gflag  &&  maxlen > 0  &&  charset > 0  &&  chainlen > 0  &&  tablelen > 0  &&  ntables > 0 ) {
+
+#ifdef DEBUG
+
+        printf("gflag_0: %d\nmaxlen_0: %u\ncharset_0: %u\nchainlen_0: %u\ntablelen_0: %u\n"
+        "ntables_0: %u\n", gflag, maxlen, charset, chainlen, tablelen, ntables);
+
+#endif
+
 
         init_generate_rbt(maxlen, charset, chainlen, tablelen, ntables, nthreads);
         //generate_rbt();

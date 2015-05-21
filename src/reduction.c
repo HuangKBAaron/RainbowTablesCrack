@@ -90,7 +90,7 @@ static unsigned int
 reduction_length(unsigned long long index){
 
     int i;
-    for(i = get_key_length() - 2 ; i >= 0 ; i--){
+    for(i = get_key_max_length() - 2 ; i >= 0 ; i--){
 
         if(index >= get_subspace(i))
             return i + 2;

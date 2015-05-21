@@ -38,8 +38,8 @@ struct Shared {
 struct Ctx generate_ctx;
 struct Shared shared;
 
-sem_t  sem;  /* Semaforo */
-sem_t  sem2;  /* Semaforo 2 */
+sem_t  *sem;
+sem_t  *sem2;
 
 
 
@@ -48,12 +48,12 @@ void
 init_generate_rbt(unsigned int maxlen, unsigned int charset, unsigned int chainlen, unsigned int tablelen, 
                   unsigned int ntables, unsigned int nthreads) {
 
-    if(sem_init(&sem, 0, 1) == -1) {
+    if((sem = sem_open("semaphore1", O_CREAT, 0644, 1)) == SEM_FAILED) {
         perror( "can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
 
-    if(sem_init(&sem2, 0, 1) == -1) {
+    if((sem2 = sem_open("semaphone2", O_CREAT, 0644, 1)) == SEM_FAILED) {
         perror( "can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
@@ -67,17 +67,22 @@ init_generate_rbt(unsigned int maxlen, unsigned int charset, unsigned int chainl
     generate_ctx.nthreads = nthreads;
     generate_ctx.rbt_package = name_rbt_package(maxlen, charset, chainlen, ntables);
 
-    if(mkdir(generate_ctx.rbt_package, S_IRWXU) !=0){
-        printf("Cant't make directory\n");
+    if(mkdir_recursive(generate_ctx.rbt_package, S_IRWXU) != 0) {
+        printf("Cant't make Rainbow Table Package\n");
         exit(1);
     }
 
     shared.collision_ctr = 0;
     shared.index_ctr = 0;
 
-    printf("maxlen: %u\ncharset: %u\nchainlen: %u\ntablelen: %u\nntables: %u\nthreads: %u\npackage: %s\n",
+#ifdef DEBUG
+
+    printf("maxlen_1: %u\ncharset_1: %u\nchainlen_1: %u\ntablelen_1: %u\nntables_1: %u\nnthreads_1: %u\npackage_1: %s\n",
            generate_ctx.maxlen, charset, generate_ctx.chainlen, generate_ctx.tablelen, generate_ctx.ntables,
            generate_ctx.nthreads, generate_ctx.rbt_package);
+
+#endif
+
 }
 
 

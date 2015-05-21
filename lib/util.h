@@ -18,7 +18,8 @@
 #define DEFAULT_THREADS 8
 #define MIN_THREADS     1
 
-#define RBT_PATH_DEFAULT "../storage/"
+#define XRAINBOW_CRACK_APP_DATA "xRainbowCrack"
+#define XRAINBOW_CRACK_STORE "store"
 #define RBT_NAME "rbt"
 
 #define RBT_DIGEST_FILE_DEFAULT "../digest_files/test"
@@ -55,3 +56,5 @@ char *name_rbt_n(char *package, unsigned int table);
 void string2sha(char *str, unsigned char *sha);
 int SHAcmp(unsigned char*sha_1, unsigned char *sha_2);
 void SHAcpy(unsigned char*sha_1, unsigned char *sha_2);
+
+int mkdir_recursive(const char *dir, mode_t mode);

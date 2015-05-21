@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <time.h>
+#include <pwd.h>
 
 #include "util.h"
 
@@ -67,14 +71,42 @@ void SHAcpy(unsigned char*sha_1, unsigned char *sha_2){
     }
 }
 
+int mkdir_recursive(const char *dir, mode_t mode) {
+    char tmp[1024];
+    char *p = NULL;
+    size_t len;
+
+    snprintf(tmp, sizeof(tmp),"%s",dir);
+    len = strlen(tmp);
+    if(tmp[len - 1] == '/')
+        tmp[len - 1] = 0;
+    for(p = tmp + 1; *p; p++)
+        if(*p == '/') {
+            *p = 0;
+            mkdir(tmp, mode);
+            *p = '/';
+        }
+    return mkdir(tmp, mode);
+}
+
 char * 
 name_rbt_package(unsigned int maxlen, unsigned int charset, unsigned int chainlen, unsigned int ntables){
 
     char *toReturn = NULL;
+    struct passwd *pw;
+    const char *homedir;
+    time_t seconds;
 
     toReturn = malloc(BUF_SIZE);
     memset(toReturn, '\0', BUF_SIZE);
-    sprintf(toReturn, "%s%s_%u_%u_%u_%u/", RBT_PATH_DEFAULT, RBT_NAME, maxlen, charset, chainlen, ntables);
+
+    pw = getpwuid(getuid());
+    homedir = pw->pw_dir;
+
+    seconds = time (NULL);
+
+    sprintf(toReturn, "%s/%s/%s_%u_%u_%u_%u_%ld/", homedir, XRAINBOW_CRACK_APP_DATA, RBT_NAME, maxlen, charset, chainlen,
+            ntables, seconds);
 
     return toReturn;
 }
