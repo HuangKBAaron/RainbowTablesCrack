@@ -162,3 +162,46 @@ void read_rbt_package(char *package, unsigned int *maxlen, char *charset_types, 
 
     free(str);
 }
+
+const char *get_config(int max_size, const char* pParameter, const char* pConfig) {
+
+    char *toReturn = NULL;
+    char buffer[BUF_SIZE], *ptr;
+
+    FILE *fp = fopen(pConfig,"r");
+    if (fp == NULL) {
+        return NULL;
+    }
+
+    while(fgets(buffer, BUFSIZ, fp) != NULL) {
+        ptr = buffer;
+        while((*ptr == ' ') || (*ptr == '\t'))
+            ptr++;
+        if ((*ptr == '\n') || (*ptr == '#')) /* Move to the next line */
+            continue;
+        if (strncmp(ptr, pParameter, strlen(pParameter)) == 0) {
+            ptr += strlen(pParameter);
+            while((*ptr == ' ') || (*ptr == '\t'))
+                ptr++;
+            if (*ptr != '=') { /* Move to the next line */
+                continue;
+            }
+            ptr++;
+            while ((*ptr == ' ') || (*ptr == '\t')) {
+                ptr++;
+            }
+            if (*ptr != '\n') {
+                toReturn = malloc(max_size + 1);
+                memset(toReturn, 0, max_size + 1);
+                strncpy(toReturn, (char *)ptr, max_size);
+                if (toReturn[strlen(toReturn)-1] == '\n') {
+                    toReturn[strlen(toReturn)-1] = '\0';
+                }
+                break;
+            }
+        }
+    }
+
+    fclose(fp);
+    return toReturn;
+}

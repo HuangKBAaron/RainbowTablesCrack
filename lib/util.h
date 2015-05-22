@@ -21,6 +21,7 @@
 #define XRAINBOW_CRACK_APP_DATA "xRainbowCrack"
 #define XRAINBOW_CRACK_STORE "store"
 #define RBT_NAME "rbt"
+#define XRAINBOW_CRACK_CONFIG "rbt.feat"
 
 #define RBT_DIGEST_FILE_DEFAULT "../digest_files/test"
 
@@ -37,6 +38,13 @@
 #define SPE_STR "s"
 
 #define BUF_SIZE 1024
+
+#define MAXLEN_CONFIG_PARAM_NAME "maxlen"
+#define CHARSET_CONFIG_PARAM_NAME "charset"
+#define CHAINLEN_CONFIG_PARAM_NAME "chainlen"
+#define NTABLES_CONFIG_PARAM_NAME "ntables"
+
+
 
 enum CharsetType {
 	MIN,
@@ -58,3 +66,4 @@ int SHAcmp(unsigned char*sha_1, unsigned char *sha_2);
 void SHAcpy(unsigned char*sha_1, unsigned char *sha_2);
 
 int mkdir_recursive(const char *dir, mode_t mode);
+const char *get_config(int max_size, const char* pParameter, const char* pConfig);

@@ -192,10 +192,14 @@ int main (int argc, char *argv[])
         init_generate_rbt(maxlen, charset, chainlen, tablelen, ntables, nthreads);
         generate_rbt();
     } else if ( rvalue != NULL  &&  fvalue != NULL ) {
-        /*
-        printf("rvalue: %s\nfvalue: %s\n", rvalue, fvalue);
-         */
-        //init_break(rvalue, nthreads);
+
+#ifdef DEBUG
+
+        printf("rvalue_2: %s\nfvalue_2: %s\n", rvalue, fvalue);
+
+#endif
+
+        init_break(rvalue, nthreads);
         //break_file(fvalue);
     } else {
         print_usage();

@@ -37,11 +37,11 @@ class TestXRainbowCrack(unittest.TestCase):
 
         self.assertTrue("Usage: " in out)
 
-    def test0_with_args(self):
+    def test_generate_args(self):
         out, err = exec_cmd(self.APP_NAME + " -g -m 5 -s u -c 7 -l 8 -n 9")
 
         # point0
-        self.assertTrue("gflag_0: 1" in out)
+        self.assertTrue("gflag_0: 1" in out, out)
         self.assertTrue("maxlen_0: 5" in out)
         self.assertTrue("charset_0: 4" in out)
         self.assertTrue("chainlen_0: 7" in out)
@@ -57,6 +57,12 @@ class TestXRainbowCrack(unittest.TestCase):
         self.assertTrue("nthreads_1: 8" in out)
         self.assertTrue("package_1: " + self.home + "/xRainbowCrack/rbt_5_4_7_9_" in out)
 
+    def test_crack_args(self):
+        out, err = exec_cmd(self.APP_NAME + " -r resources/sample_hashed_passwords.txt -f " + self.home + "/xRainbowCrack/rbt_5_4_7_9_")
+
+        # point2
+        self.assertTrue("rvalue_2: resources/sample_hashed_passwords.txt" in out)
+        self.assertTrue("fvalue_2: "+ self.home + "/xRainbowCrack/rbt_5_4_7_9" in out)
 
 
 if __name__ == '__main__':

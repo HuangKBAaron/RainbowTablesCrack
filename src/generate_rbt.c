@@ -66,6 +66,9 @@ init_generate_rbt(unsigned int maxlen, unsigned int charset, unsigned int chainl
         exit(EXIT_FAILURE);
     }
 
+    shared.collision_ctr = 0;
+    shared.index_ctr = 0;
+
     init_reduction(maxlen, charset);
 
     generate_ctx.maxlen = maxlen;
@@ -80,8 +83,19 @@ init_generate_rbt(unsigned int maxlen, unsigned int charset, unsigned int chainl
         exit(1);
     }
 
-    shared.collision_ctr = 0;
-    shared.index_ctr = 0;
+    char *filename;
+    unsigned int filename_len = strlen(generate_ctx.rbt_package) + strlen(XRAINBOW_CRACK_CONFIG) + 2;
+    filename = malloc(filename_len);
+    memset(filename, '\0', filename_len);
+
+    sprintf(filename, "%s/%s", generate_ctx.rbt_package, XRAINBOW_CRACK_CONFIG);
+
+    FILE *fd = fopen(filename, "w+");
+    fprintf(fd, "%s = %u\n", MAXLEN_CONFIG_PARAM_NAME, maxlen);
+    fprintf(fd, "%s = %u\n", CHARSET_CONFIG_PARAM_NAME, charset);
+    fprintf(fd, "%s = %u\n", CHAINLEN_CONFIG_PARAM_NAME, chainlen);
+    fprintf(fd, "%s = %u\n", NTABLES_CONFIG_PARAM_NAME, ntables);
+    fclose(fd);
 
 #ifdef DEBUG
 
