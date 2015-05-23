@@ -81,6 +81,10 @@ static unsigned int hashValue2(unsigned long long key){
 }
 
 
+void values(Mmp_Hash *h) {
+
+}
+
 
 void create_hash_table(Mmp_Hash *h, char *table_name){
 

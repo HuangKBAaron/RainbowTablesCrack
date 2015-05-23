@@ -7,6 +7,8 @@
 '''
 
 import unittest
+import shutil
+import os
 
 from os.path import expanduser
 from lib.testutil import exec_cmd
@@ -22,9 +24,12 @@ class TestXRainbowCrack(unittest.TestCase):
     def setUpClass(cls):
         TestXRainbowCrack.home = expanduser("~")
 
+        if os.path.isdir(TestXRainbowCrack.home + '/xRainbowCrack/rbt_test'):
+            shutil.rmtree(TestXRainbowCrack.home + '/xRainbowCrack/rbt_test')
+
     @classmethod
     def tearDownClass(cls):
-        pass
+        shutil.rmtree(TestXRainbowCrack.home + '/xRainbowCrack/rbt_test')
 
 
     def test_help(self):
@@ -37,7 +42,7 @@ class TestXRainbowCrack(unittest.TestCase):
 
         self.assertTrue("Usage: " in out)
 
-    def test_generate_args(self):
+    def test0_generate_args(self):
         out, err = exec_cmd(self.APP_NAME + " -g -m 5 -s u -c 7 -l 8 -n 9")
 
         # point0
@@ -55,14 +60,25 @@ class TestXRainbowCrack(unittest.TestCase):
         self.assertTrue("tablelen_1: 8" in out)
         self.assertTrue("ntables_1: 9" in out)
         self.assertTrue("nthreads_1: 8" in out)
-        self.assertTrue("package_1: " + self.home + "/xRainbowCrack/rbt_5_4_7_9_" in out)
+        self.assertTrue("package_1: " + self.home + "/xRainbowCrack/rbt_test" in out)
 
-    def test_crack_args(self):
-        out, err = exec_cmd(self.APP_NAME + " -r resources/sample_hashed_passwords.txt -f " + self.home + "/xRainbowCrack/rbt_5_4_7_9_")
+    def test1_analyze_args(self):
+        out, err = exec_cmd(self.APP_NAME + " -a " + self.home + "/xRainbowCrack/rbt_test")
+
+        # point3
+        self.assertTrue("avalue_2: " + self.home + "/xRainbowCrack/rbt_test" in out)
+        self.assertTrue("maxlen_2: 5" in out)
+        self.assertTrue("charset_2: 4" in out)
+        self.assertTrue("chainlen_2: 7" in out)
+        self.assertTrue("ntables_2: 9" in out)
+
+    def test2_crack_args(self):
+        out, err = exec_cmd(self.APP_NAME + " -r resources/sample_hashed_passwords.txt -f " + self.home + "/xRainbowCrack/rbt_test")
 
         # point2
-        self.assertTrue("rvalue_2: resources/sample_hashed_passwords.txt" in out)
-        self.assertTrue("fvalue_2: "+ self.home + "/xRainbowCrack/rbt_5_4_7_9" in out)
+        self.assertTrue("rvalue_3: resources/sample_hashed_passwords.txt" in out)
+        self.assertTrue("fvalue_3: "+ self.home + "/xRainbowCrack/rbt_test" in out)
+
 
 
 if __name__ == '__main__':

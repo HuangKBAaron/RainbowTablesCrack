@@ -51,8 +51,7 @@ enum CharsetType {
 	MAY,
 	NUM,
 	SPE
-}; 
-
+};
 
 
 
@@ -67,3 +66,6 @@ void SHAcpy(unsigned char*sha_1, unsigned char *sha_2);
 
 int mkdir_recursive(const char *dir, mode_t mode);
 const char *get_config(int max_size, const char* pParameter, const char* pConfig);
+
+unsigned int clean_int(char *arg);
+unsigned int clean_charset(char *arg);

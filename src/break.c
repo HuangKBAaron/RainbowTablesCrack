@@ -203,7 +203,7 @@ lookup(unsigned char *searchedSha, int t){
 
         i_index = get(&break_ctx.rbt_tables[t], index);
 
-        if(i_index){			// case find collision
+        if(i_index){                // case find collision
 
             search_sha(searchedSha, i_index, i, t, plain_result);
             if(strcmp(plain_result, "") != 0){

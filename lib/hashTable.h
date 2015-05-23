@@ -20,3 +20,4 @@ void put(Mmp_Hash *h, unsigned long long key, unsigned int value);
 void create_hash_table(Mmp_Hash *h, char *table_name);
 void init_hash_table(Mmp_Hash *h, char *table_name);
 void close_hash_table(Mmp_Hash *h);
+void values(Mmp_Hash *h);

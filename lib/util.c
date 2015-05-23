@@ -8,6 +8,9 @@
 
 #include "util.h"
 
+#include "x_rainbow_crack.h"
+#include "charset.h"
+
 
 static void reverse(char *s);
 
@@ -105,8 +108,16 @@ name_rbt_package(unsigned int maxlen, unsigned int charset, unsigned int chainle
 
     seconds = time (NULL);
 
+#ifdef DEBUG
+
+    sprintf(toReturn, "%s/%s/%s_%s/", homedir, XRAINBOW_CRACK_APP_DATA, RBT_NAME, "test");
+
+#else
+
     sprintf(toReturn, "%s/%s/%s_%u_%u_%u_%u_%ld/", homedir, XRAINBOW_CRACK_APP_DATA, RBT_NAME, maxlen, charset, chainlen,
             ntables, seconds);
+
+#endif
 
     return toReturn;
 }
@@ -204,4 +215,32 @@ const char *get_config(int max_size, const char* pParameter, const char* pConfig
 
     fclose(fp);
     return toReturn;
+}
+
+unsigned int clean_int(char *arg) {
+    if (arg != NULL) {
+        return (unsigned int)atoi(arg);
+    }
+    return 0;
+}
+
+unsigned int clean_charset(char *arg) {
+    if (arg == NULL)
+        return 0;
+
+    unsigned int val;
+    val = clean_int(arg);
+    if (val > 0)
+        return val;
+
+    val = 0;
+    if (strchr(arg, NUMERIC_CHARSET_CODE))
+        val += NUMERIC;
+    if (strchr(arg, LOWERALPHA_CHARSET_CODE))
+        val += LOWERALPHA;
+    if (strchr(arg, UPPERALPHA_CHARSET_CODE))
+        val += UPPERALPHA;
+    if (strchr(arg, SPECIAL_CHARSET_CODE))
+        val += SPECIALCHARS;
+    return val;
 }

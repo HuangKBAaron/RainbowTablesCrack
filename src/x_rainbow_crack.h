@@ -14,6 +14,8 @@
                               "                      -n TABLES_NUMBER\n"\
                               "       xrainbow_crack -f DIGEST_FILE -r PATH/TO/RAINBOW_TABLE_PACKAGE\n"\
                               "\n"\
+                              "       xrainbow_crack -a PATH/TO/RAINBOW_TABLE_PACKAGE\n"\
+                              "\n"\
                               "                      -t threads\n"\
                               "\n"\
                               "                      [--version]\n"
