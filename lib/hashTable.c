@@ -20,6 +20,7 @@ const unsigned long shift = 13;
 const unsigned long capacity = 179424673;	
 const unsigned long q = 997;			// q prime and lower tha capacity
 
+static unsigned int iterator = 0;
 
 
 static unsigned int findKey(Mmp_Hash *h, unsigned long long key);
@@ -81,8 +82,23 @@ static unsigned int hashValue2(unsigned long long key){
 }
 
 
-void values(Mmp_Hash *h) {
+void init_iterator() {
+    iterator = 0;
+}
 
+unsigned int next_value(Mmp_Hash *h) {
+    unsigned int k;
+    do {
+
+        k = h->fmem[iterator].value ;
+        if (k != 0)
+            return k;
+
+        iterator++;
+
+    } while (iterator < capacity);
+
+    return 0;
 }
 
 
