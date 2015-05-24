@@ -70,7 +70,7 @@ analyze_rbt(unsigned int columns) {
             index2plain(index, r);
             for (j = 0 ; j < analyze_ctx.chainlen ; j++) {
                 printf("%s ", r);
-                if ((j % columns) == 0)
+                if (((j+1) % columns) == 0)
                     printf("\n");
 
                 SHA1(r, strlen(r), sha);
@@ -78,4 +78,5 @@ analyze_rbt(unsigned int columns) {
             }
         }
     }
+    printf("\n");
 }

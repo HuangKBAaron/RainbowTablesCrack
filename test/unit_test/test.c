@@ -4,6 +4,7 @@
 
 #include "test.h"
 #include "hashTable.h"
+#include "charset.h"
 
 
 
@@ -34,9 +35,25 @@ void test_hash_table() {
     close_hash_table(&hash_table);
 }
 
+void test_charset() {
+
+    init_charset(4);
+    struct arrayset *chrst = get_charset();
+
+    for (int i = 0; i < chrst->size; ++i) {
+        printf("%c\n", chrst->elements[i]);
+    }
+
+
+    unsigned int len = charset_length();
+
+    printf("len: %u\n", len);
+}
+
 
 int main (int argc, char *argv[]) {
 
-    test_hash_table();
+    //test_hash_table();
+    test_charset();
 
 }

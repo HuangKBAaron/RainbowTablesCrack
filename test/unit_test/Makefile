@@ -8,7 +8,7 @@ SRC_DIR := $(ROOT_DIR)/src
 SRCEXT := c
 BUILDEXT := o
 
-SOURCES := $(shell find . -type f -name "*.$(SRCEXT)") $(LIB_DIR)/hashTable.c $(LIB_DIR)/util.c
+SOURCES := $(shell find . -type f -name "*.$(SRCEXT)") $(LIB_DIR)/hashTable.c $(LIB_DIR)/util.c $(SRC_DIR)/charset.c
 OBJECTS := $(patsubst %.$(SRCEXT),%.$(BUILDEXT),$(SOURCES))
 TARGET := test
 

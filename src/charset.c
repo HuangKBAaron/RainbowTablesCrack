@@ -14,7 +14,7 @@ init_charset(unsigned int charset) {
     unsigned int code = charset;
     charset_ctx.size = 0;
 
-    if(charset >= SPECIALCHARS) {
+    if(code >= SPECIALCHARS) {
         charset_ctx.elements[charset_ctx.size]= '.';
         charset_ctx.size++;
 
@@ -24,7 +24,7 @@ init_charset(unsigned int charset) {
         code -= SPECIALCHARS;
     }
 
-    if(charset >= UPPERALPHA) {
+    if(code >= UPPERALPHA) {
         for(i = 'A'; i <= 'Z' ; i++){
             charset_ctx.elements[charset_ctx.size] = i;
             charset_ctx.size++;
@@ -32,7 +32,7 @@ init_charset(unsigned int charset) {
         code -= UPPERALPHA;
     }
 
-    if(charset >= LOWERALPHA) {
+    if(code >= LOWERALPHA) {
         for(i = 'a'; i <= 'z' ; i++){
             charset_ctx.elements[charset_ctx.size] = i;
             charset_ctx.size++;
@@ -40,7 +40,7 @@ init_charset(unsigned int charset) {
         code -= LOWERALPHA;
     }
 
-    if(charset >= NUMERIC) {
+    if(code >= NUMERIC) {
         for(i = '0'; i <= '9' ; i++){
             charset_ctx.elements[charset_ctx.size]= i;
             charset_ctx.size++;
