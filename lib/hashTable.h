@@ -22,4 +22,4 @@ void init_iterator(void);
 unsigned int next_value(Mmp_Hash *h);
 void init_hash_table(Mmp_Hash *h, char *table_name);
 void close_hash_table(Mmp_Hash *h);
-void values(Mmp_Hash *h);
+void load_rainbow_tables(char *package, unsigned int n_tables, Mmp_Hash *rbt_tables);

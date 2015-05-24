@@ -12,6 +12,7 @@
 #include "charset.h"
 
 
+
 static void reverse(char *s);
 
 
@@ -244,3 +245,4 @@ unsigned int clean_charset(char *arg) {
         val += SPECIALCHARS;
     return val;
 }
+

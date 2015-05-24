@@ -190,6 +190,7 @@ int main (int argc, char *argv[]) {
 #endif
 
         init_analyze_rbt(avalue);
+        analyze_rbt(4);
 
     } else {
 

@@ -8,13 +8,15 @@ SRC_DIR := $(ROOT_DIR)/src
 SRCEXT := c
 BUILDEXT := o
 
-SOURCES := $(shell find . -type f -name "*.$(SRCEXT)")
+SOURCES := $(shell find . -type f -name "*.$(SRCEXT)" ! -path "./test/*")
 OBJECTS := $(patsubst %.$(SRCEXT),%.$(BUILDEXT),$(SOURCES))
 TARGET := xrainbow_crack
 INSTALL_PATH := /usr/bin/
 
-CFLAGS += -g -Wall -DDEBUG -I$(LIB_DIR) -I$(SRC_DIR) -I$(ROOT_DIR)
-LDFLAGS += -pthread -lm -lcrypto
+CFLAGS += -g -Wall -DDEBUG -I$(LIB_DIR) -I$(SRC_DIR)
+LDFLAGS += -lm -lcrypto
+#LDFLAGS += -lm -lcrypto -pthread
+
 
 all: ${TARGET}
 

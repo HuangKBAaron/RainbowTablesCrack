@@ -1,8 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <openssl/sha.h>
 
 #include "analyze_rbt.h"
 
+#include "hashTable.h"
 #include "util.h"
 #include "reduction.h"
 
@@ -56,19 +58,24 @@ init_analyze_rbt(char *package) {
 }
 
 void
-analyze_rbt() {
+analyze_rbt(unsigned int columns) {
+    unsigned char sha[20];
+    char r[MAX_MKEY_LENGTH+1];
     unsigned int index;
 
-    int i, j, k;
+    int i, j;
     for (i = 0 ; i < analyze_ctx.ntables ; i++) {
+        init_iterator();
+        while ((index = next_value(&rbt_tables[i])) != 0) {
+            index2plain(index, r);
+            for (j = 0 ; j < analyze_ctx.chainlen ; j++) {
+                printf("%s ", r);
+                if ((j % columns) == 0)
+                    printf("\n");
 
-        index = get(rbt_tables[i], index);
-
-    }
-
-
-    int i;
-    for(i = 0 ; i < analyze_ctx.chainlen ; i++){
-
+                SHA1(r, strlen(r), sha);
+                sha2plain(sha, j, i, r);
+            }
+        }
     }
 }

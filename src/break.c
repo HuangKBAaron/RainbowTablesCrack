@@ -43,40 +43,11 @@ static sem_t  sem4;
 
 
 static void load_digest_file(char *file);
-static void load_rainbow_tables(char *package, unsigned int n_tables, Mmp_Hash *rbt_tables);
 static void search_sha(unsigned char *searchedSha, unsigned long initWord, unsigned int max_ite, int table, char *r);
 static int lookup(unsigned char *searchedSha, int table);
 static void *child(void *v);
 
 
-
-static void
-load_rainbow_tables(char *package, unsigned int n_tables, Mmp_Hash *rbt_tables){
-
-    unsigned int packagelen = strlen(package);
-    unsigned int namelen = strlen(RBT_NAME);
-    unsigned int ilen = 11;
-    unsigned int pkg_table_namelen = packagelen + namelen + ilen + 1;
-
-    char *i_str = malloc(ilen);
-    char *pkg_table_name = malloc(pkg_table_namelen + 1);
-
-    unsigned int i;
-    for(i = 0 ; i < n_tables ; i++){
-
-        itoa(i, i_str);
-
-        strcpy(pkg_table_name, package);
-        strcat(pkg_table_name, RBT_NAME);
-        strcat(pkg_table_name, "_");
-        strcat(pkg_table_name, i_str);
-
-        init_hash_table(&rbt_tables[i], pkg_table_name);
-    }
-
-    free(i_str);
-    free(pkg_table_name);
-}
 
 void
 init_break(char *package, unsigned int threads){

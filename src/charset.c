@@ -24,14 +24,6 @@ init_charset(unsigned int charset) {
         code -= SPECIALCHARS;
     }
 
-    if(charset >= NUMERIC) {
-        for(i = '0'; i <= '9' ; i++){
-            charset_ctx.elements[charset_ctx.size]= i;
-            charset_ctx.size++;
-        }
-        code -= NUMERIC;
-    }
-
     if(charset >= UPPERALPHA) {
         for(i = 'A'; i <= 'Z' ; i++){
             charset_ctx.elements[charset_ctx.size] = i;
@@ -46,6 +38,14 @@ init_charset(unsigned int charset) {
             charset_ctx.size++;
         }
         code -= LOWERALPHA;
+    }
+
+    if(charset >= NUMERIC) {
+        for(i = '0'; i <= '9' ; i++){
+            charset_ctx.elements[charset_ctx.size]= i;
+            charset_ctx.size++;
+        }
+        code -= NUMERIC;
     }
 }
 

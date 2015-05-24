@@ -12,6 +12,10 @@
 
 #include "hashTable.h"
 
+#include "util.h"
+
+
+
 enum { PERMS = 0660 };
 
 const unsigned long prime = 179424673;	
@@ -49,13 +53,9 @@ unsigned int get(Mmp_Hash *h, unsigned long long key){
 /* Find a key and return the index according to key. If it is not found, it return
 a new index for the given key. DobleHash is used to solved collisions */
 static unsigned int findKey(Mmp_Hash *h, unsigned long long key){
-
-    unsigned int value;
-
     unsigned int i = hashValue(key);
     unsigned int j = i;
     unsigned long long k;
-    unsigned int v;
     do{
         k = h->fmem[i].key ;
 
@@ -91,10 +91,11 @@ unsigned int next_value(Mmp_Hash *h) {
     do {
 
         k = h->fmem[iterator].value ;
+        iterator++;
+
         if (k != 0)
             return k;
 
-        iterator++;
 
     } while (iterator < capacity);
 
@@ -155,3 +156,30 @@ void close_hash_table(Mmp_Hash *h){
     close(h->fd);
 }
 
+void
+load_rainbow_tables(char *package, unsigned int n_tables, Mmp_Hash *rbt_tables) {
+
+    unsigned int packagelen = strlen(package);
+    unsigned int namelen = strlen(RBT_NAME);
+    unsigned int ilen = 11;
+    unsigned int pkg_table_namelen = packagelen + namelen + ilen + 1;
+
+    char *i_str = malloc(ilen);
+    char *pkg_table_name = malloc(pkg_table_namelen + 1);
+
+    unsigned int i;
+    for(i = 0 ; i < n_tables ; i++){
+
+        itoa(i, i_str);
+
+        strcpy(pkg_table_name, package);
+        strcat(pkg_table_name, RBT_NAME);
+        strcat(pkg_table_name, "_");
+        strcat(pkg_table_name, i_str);
+
+        init_hash_table(&rbt_tables[i], pkg_table_name);
+    }
+
+    free(i_str);
+    free(pkg_table_name);
+}
