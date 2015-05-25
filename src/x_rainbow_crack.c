@@ -180,7 +180,7 @@ int main (int argc, char *argv[]) {
 #endif
 
         init_break(rvalue, nthreads);
-        //break_file(fvalue);
+        break_digest_file(fvalue);
     } else if (avalue != NULL) {
 
 #ifdef DEBUG

@@ -103,7 +103,7 @@ newproc(void *(*tmain)(void *), void *args)
 }
 
 void
-break_file(char *digest_file){
+break_digest_file(char *digest_file){
 
     load_digest_file(digest_file);
     printf("digest file -> %s\n", digest_file);
