@@ -62,16 +62,11 @@ init_break(char *package, unsigned int threads){
         exit(EXIT_FAILURE);
     }
 
-    printf("break1\n");
     init_ctx_from_package(&break_ctx, package);
-    printf("break2\n");
     break_ctx.nthreads = threads;
-    printf("break3\n");
 
     load_rainbow_tables(package, break_ctx.ntables, rbt_tables);
-    printf("break4\n");
     init_reduction(break_ctx.maxlen, break_ctx.charset);
-    printf("break5\n");
 
     shared.digest_ctr = 0;
     shared.crack_ctr = 0;
