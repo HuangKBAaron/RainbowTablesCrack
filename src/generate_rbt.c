@@ -16,15 +16,6 @@
 #include "hashTable.h"
 
 
-struct Ctx {
-    unsigned int maxlen;
-    unsigned int tablelen;
-    unsigned int chainlen;
-    unsigned int ntables;
-    unsigned int nthreads;
-
-    char *rbt_package;
-};
 
 struct Shared {
     unsigned long long collision_ctr;
@@ -40,9 +31,6 @@ struct Shared shared;
 
 sem_t  *sem;
 sem_t  *sem2;
-
-
-
 
 
 static void generate_table(unsigned int n_table);

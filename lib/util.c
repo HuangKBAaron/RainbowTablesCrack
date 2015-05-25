@@ -246,3 +246,39 @@ unsigned int clean_charset(char *arg) {
     return val;
 }
 
+void
+init_ctx_from_package(struct Ctx *ctx, char *package) {
+    char *filename = NULL;
+    filename = get_feat_from_package(package);
+
+    char *maxlen_str = get_config(2, MAXLEN_CONFIG_PARAM_NAME, filename);
+    char *charset_str = get_config(2, CHARSET_CONFIG_PARAM_NAME, filename);
+    char *chainlen_str = get_config(15, CHAINLEN_CONFIG_PARAM_NAME, filename);
+    char *ntables_str = get_config(2, NTABLES_CONFIG_PARAM_NAME, filename);
+
+    unsigned int max_len = clean_int(maxlen_str);
+    unsigned int char_set = clean_charset(charset_str);
+    unsigned int chain_len = clean_int(chainlen_str);
+    unsigned int n_tables = clean_int(ntables_str);
+
+    ctx -> maxlen = max_len;
+    ctx -> charset = char_set;
+    ctx -> chainlen = chain_len;
+    ctx -> ntables = n_tables;
+    ctx -> rbt_package = package;
+}
+
+char *
+get_feat_from_package(char *package) {
+
+    char *filename;
+    unsigned int filename_len;
+
+    filename_len = strlen(package) + strlen(XRAINBOW_CRACK_CONFIG) + 2;
+    filename = malloc(filename_len);
+    memset(filename, '\0', filename_len);
+
+    sprintf(filename, "%s/%s", package, XRAINBOW_CRACK_CONFIG);
+
+    return filename;
+}

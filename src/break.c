@@ -17,16 +17,6 @@
 
 
 
-
-static struct Ctx {
-    unsigned int chainlen;
-    unsigned int ntables;
-    unsigned int nthreads;
-
-    FILE *fp_digest;
-    Mmp_Hash rbt_tables[MAX_TABLES];
-};
-
 static struct Shared{
     unsigned int crack_ctr;
     unsigned int digest_ctr;
@@ -35,16 +25,19 @@ static struct Shared{
 static struct Ctx break_ctx;
 static struct Shared shared;
 
-static sem_t  sem;
-static sem_t  sem2;
-static sem_t  sem3;
-static sem_t  sem4;
+FILE *fp_digest;
+Mmp_Hash rbt_tables[MAX_TABLES];
+
+static sem_t  *sem;
+static sem_t  *sem2;
+static sem_t  *sem3;
+static sem_t  *sem4;
 
 
 
 static void load_digest_file(char *file);
 static void search_sha(unsigned char *searchedSha, unsigned long initWord, unsigned int max_ite, int table, char *r);
-static int lookup(unsigned char *searchedSha, int table);
+static char *lookup(unsigned char *searchedSha, int table);
 static void *child(void *v);
 
 
@@ -69,14 +62,16 @@ init_break(char *package, unsigned int threads){
         exit(EXIT_FAILURE);
     }
 
-    unsigned int maxlen = 0;
-    unsigned int charset = 0;
-
-    //read_rbt_package(package, maxlen, charset, &break_ctx.chainlen, &break_ctx.ntables);
+    printf("break1\n");
+    init_ctx_from_package(&break_ctx, package);
+    printf("break2\n");
     break_ctx.nthreads = threads;
+    printf("break3\n");
 
-    load_rainbow_tables(package, break_ctx.ntables, &break_ctx.rbt_tables);
-    init_reduction(maxlen, charset);
+    load_rainbow_tables(package, break_ctx.ntables, rbt_tables);
+    printf("break4\n");
+    init_reduction(break_ctx.maxlen, break_ctx.charset);
+    printf("break5\n");
 
     shared.digest_ctr = 0;
     shared.crack_ctr = 0;
@@ -90,10 +85,10 @@ init_break(char *package, unsigned int threads){
 static void
 load_digest_file(char *file){
 
-    break_ctx.fp_digest = open(file, O_RDONLY, 0777);
+    fp_digest = open(file, O_RDONLY, 0777);
 
-    if(break_ctx.fp_digest == NULL){
-        printf("can't read file.\n");
+    if(fp_digest == NULL){
+        printf("Can't read digest file.\n");
     }
 }
 
@@ -106,7 +101,7 @@ newproc(void *(*tmain)(void *), void *args)
     pthread_attr_init(&attr);
     pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
     if(pthread_create(&thread, &attr, tmain, args)){
-        fprintf(stderr, "cannot create pthread\n");
+        fprintf(stderr, "Can't create pthread\n");
         exit(EXIT_FAILURE);
     }
     return thread;
@@ -137,10 +132,10 @@ break_file(char *digest_file){
     free(childs);
 
     for(i = 0 ; i < break_ctx.ntables ; i++){
-        close_hash_table(&break_ctx.rbt_tables[i]);
+        close_hash_table(&rbt_tables[i]);
     }
 
-    close(break_ctx.fp_digest);
+    close(fp_digest);
 
     printf("\n");
     printf("Se ha roto %u passwords de un total de %d, lo que supone un tasa de exito del %d%\n",
@@ -149,15 +144,18 @@ break_file(char *digest_file){
 
 
 
-static int
+static char *
 lookup(unsigned char *searchedSha, int t){
 
     unsigned char sha[20];
     char r[MAX_MKEY_LENGTH + 1];
-    char plain_result[MAX_MKEY_LENGTH + 1];
+    char *plain_result;
     unsigned long long index;
     unsigned int i_index;
     int k;
+
+    plain_result = malloc(MAX_MKEY_LENGTH + 1);
+    memset(plain_result, '\0', MAX_MKEY_LENGTH + 1);
 
     int i;
     for(i = break_ctx.chainlen - 1 ; i >= 0 ; i--){
@@ -172,28 +170,28 @@ lookup(unsigned char *searchedSha, int t){
             index = sha2index(sha, k, t);
         }
 
-        i_index = get(&break_ctx.rbt_tables[t], index);
+        i_index = get(&rbt_tables[t], index);
 
         if(i_index){                // case find collision
 
             search_sha(searchedSha, i_index, i, t, plain_result);
             if(strcmp(plain_result, "") != 0){
 
-                sem_wait(&sem2);	// up()
+                sem_wait(sem2);
                 int i;
                 for(i=0 ; i < 20 ; i++){
                     printf("%02x", searchedSha[i]);
                 }
                 printf(" -> ");
                 printf("%s\n", plain_result);
-                sem_post(&sem2);	// up()
+                sem_post(sem2);
 
-                return 1;
+                return plain_result;
             }
         }
     }
 
-    return 0;
+    return NULL;
 }
 
 
@@ -221,44 +219,79 @@ search_sha(unsigned char *searchedSha, unsigned long initWord, unsigned int max_
 static void *
 child(void *v)
 {
-    int found;
+    char *plain;
     char sha_text[41];
     unsigned char sha[20];
 
     int j, i ;
-    sem_wait(&sem);	// down()
+    sem_wait(sem);
 
-    for(i = 0 ; read(break_ctx.fp_digest, sha_text, sizeof(sha_text)) ; i++){
+    for(i = 0 ; read(fp_digest, sha_text, sizeof(sha_text)) ; i++){
 
         shared.digest_ctr++;
-        sem_post(&sem);	// up()
+        sem_post(sem);
 
         string2sha(sha_text, sha);
 
         for(j = 0 ; j < break_ctx.ntables ; j++){
 
-            found = lookup(sha, j);
-            if(found){
-                sem_wait(&sem3);	// down()
+            plain = lookup(sha, j);
+            if(plain != NULL){
+                sem_wait(sem3);
                 shared.crack_ctr++;
-                sem_post(&sem3);	// up()
+                sem_post(sem3);
 
                 break ;
             }
         }
-        if(!found){
-            sem_wait(&sem2);	// down()
+        if(plain == NULL){
+            sem_wait(sem2);
             int i;
             for(i=0 ; i < 20 ; i++){
                 printf("%02x", sha[i]);
             }
             printf(" (not found)\n");
-            sem_post(&sem2);	// up()
+            sem_post(sem2);
         }
 
-        sem_wait(&sem);	// down()	
+        sem_wait(sem);
     }
-    sem_post(&sem);	// up()
+    sem_post(sem);
 
     pthread_exit(0);
+}
+
+char *
+break_digest(char *digest_str)
+{
+    char *plain = NULL;
+    unsigned char sha[20];
+    int j, i ;
+
+    string2sha(digest_str, sha);
+
+    for(j = 0 ; j < break_ctx.ntables ; j++){
+
+        plain = lookup(sha, j);
+        if(plain != NULL){
+            sem_wait(sem3);
+            shared.crack_ctr++;
+            sem_post(sem3);
+
+            return plain;
+        }
+    }
+    if(plain == NULL){
+        sem_wait(sem2);
+        int i;
+        for(i=0 ; i < 20 ; i++){
+            printf("%02x", sha[i]);
+        }
+        printf(" (not found)\n");
+        sem_post(sem2);
+    }
+
+    return NULL;
+
+    //pthread_exit(0);
 }
