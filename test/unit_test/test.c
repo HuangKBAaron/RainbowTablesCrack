@@ -36,9 +36,25 @@ void test_hash_table() {
     close_hash_table(&hash_table);
 }
 
-void test_charset() {
+void test_charset1() {
 
     init_charset(4);
+    struct arrayset *chrst = get_charset();
+
+    for (int i = 0; i < chrst->size; ++i) {
+        printf("%c\n", chrst->elements[i]);
+    }
+
+
+    unsigned int len = charset_length();
+
+    printf("len: %u\n", len);
+}
+
+void test_charset2() {
+
+    init_charset(0);
+    add_elements("abc");
     struct arrayset *chrst = get_charset();
 
     for (int i = 0; i < chrst->size; ++i) {
@@ -68,7 +84,8 @@ void test_break() {
 int main (int argc, char *argv[]) {
 
     //test_hash_table();
-    //test_charset();
-    test_break();
+    //test_charset1();
+    test_charset2();
+    //test_break();
 
 }

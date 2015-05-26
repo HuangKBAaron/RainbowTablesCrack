@@ -22,5 +22,6 @@ struct arrayset {
 
 
 void init_charset(unsigned int charset);
+void add_elements(char *elements);
 struct arrayset *get_charset(void);
 unsigned int charset_length(void);

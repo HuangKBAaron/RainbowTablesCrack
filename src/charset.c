@@ -49,6 +49,16 @@ init_charset(unsigned int charset) {
     }
 }
 
+void add_elements(char *elements) {
+    char *chars;
+    char c;
+
+    chars = elements;
+    while((c = *chars++) != '\0'){
+        charset_ctx.elements[charset_ctx.size]= c;
+        charset_ctx.size++;
+    }
+}
 
 struct arrayset *get_charset(){
     return &charset_ctx;
