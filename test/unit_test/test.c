@@ -6,6 +6,7 @@
 #include "hashTable.h"
 #include "charset.h"
 #include "break.h"
+#include "reduction.h"
 
 
 
@@ -81,11 +82,22 @@ void test_break() {
         printf("plain: not found\n");
 }
 
+
+void test_reduction() {
+    init_reduction(4, 5, 2);
+
+    char plain[15];
+    index2plain(0, plain);
+
+    printf("plain: %s\n", plain);
+}
+
 int main (int argc, char *argv[]) {
 
     //test_hash_table();
     //test_charset1();
-    test_charset2();
+    //test_charset2();
     //test_break();
+    test_reduction();
 
 }

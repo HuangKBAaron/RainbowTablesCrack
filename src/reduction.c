@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <openssl/sha.h>
 
@@ -10,8 +11,9 @@
 
 typedef void (*functiontype)(unsigned long long, char *);
 
-functiontype index2plain_func;
-static unsigned int end_n_numbers_parameter = 0;
+static functiontype index2plain_func;
+static unsigned int end_n_subcharset_n_parameter = 0;
+static unsigned int end_n_subcharset_size_parameter = 0;
 
 
 static unsigned int reduction_length(unsigned long long index);
@@ -30,11 +32,13 @@ init_reduction(unsigned int mode, unsigned int maxlen, unsigned int charset) {
             break;
         case END_TWO_NUMBERS_MODE:
             index2plain_func = &index2plain_end_n_numbers;
-            end_n_numbers_parameter = 2;
+            end_n_subcharset_n_parameter = 2;
+            end_n_subcharset_size_parameter = 10;
             break;
         case END_FOUR_NUMBERS_MODE:
             index2plain_func = &index2plain_end_n_numbers;
-            end_n_numbers_parameter = 4;
+            end_n_subcharset_n_parameter = 4;
+            end_n_subcharset_size_parameter = 10;
             break;
     }
 }
@@ -144,14 +148,10 @@ index2plain_end_n_numbers(unsigned long long index, char *plain)
         ind /= get_charset()->size;
     }
 
-    char *end = malloc(end_n_numbers_parameter + 1);
-    sprintf(end, "%ull", ind);
-
-    for(int k = 0 ; k < end_n_numbers_parameter ; j++, k++) {
-        plain[j] = end[k];
+    for(int k = 0 ; k < end_n_subcharset_n_parameter ; j++, k++) {
+        plain[j] = (char) ('0' + ind % end_n_subcharset_size_parameter);
+        ind /= end_n_subcharset_size_parameter;
     }
 
     plain[j] = '\0';
-
-    free(end);
 }

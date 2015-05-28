@@ -66,7 +66,7 @@ init_break(char *package, unsigned int threads){
     break_ctx.nthreads = threads;
 
     load_rainbow_tables(package, break_ctx.ntables, rbt_tables);
-    init_reduction(break_ctx.maxlen, break_ctx.charset);
+    init_reduction(1, break_ctx.maxlen, break_ctx.charset);
 
     shared.digest_ctr = 0;
     shared.crack_ctr = 0;
@@ -261,7 +261,7 @@ break_digest(char *digest_str)
 {
     char *plain = NULL;
     unsigned char sha[20];
-    int j, i ;
+    int j;
 
     string2sha(digest_str, sha);
 
