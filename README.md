@@ -1,44 +1,37 @@
-Rainbow Tables Crack
-==================
+#Rainbow Tables Crack (TFM version)
 
-Rainbow tables generator and digest crack.
+Rainbow tables generator and sha1 crack.
 
+## Prerrequisites
 
+* GCC compiler and make.  
+```
+sudo apt-get install gcc make
+```
 
-Install
--------
+* Openssl.  
+```
+sudo apt-get install libssl-dev
+```
 
-Situarse en el directorio ui/
+## Installation
+
+* Change to root directory.  
 ```
 cd ui/
 ```
-Compilar el generador de Rainbow Tables
+* Compile binary.  
 ```
-make -f makefile_generator
+make
 ```
-Compilar el crack de contraseñas
+* Install.  
 ```
-make -f makefile_breaker
-```
-
-
-Generator tool
----------
-```
-Usage: rbt_generate [--version] |
-                    [--kl max_password_length]
-                    [--min --may --num --special]
-                    [--cl chain_length]
-                    [--tl table_length]
-                    [--t tables_number]
-                    [--th threads_number]
+sudo make install clean
 ```
 
-Crack tool
--------
+
+## Usage
 ```
-Usage: rbt_break [--version] |
-                 [--rbt path/to/rainbow_table_package]
-                 [--file digest_file]
-                 [--th threads_number]
+Usage: xrainbow_crack [--help] |
 ```
+
