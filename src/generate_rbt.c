@@ -57,7 +57,7 @@ init_generate_rbt(unsigned int maxlen, unsigned int charset, unsigned int chainl
     shared.collision_ctr = 0;
     shared.index_ctr = 0;
 
-    init_reduction(maxlen, charset);
+    init_reduction(1, maxlen, charset);
 
     generate_ctx.maxlen = maxlen;
     generate_ctx.tablelen = tablelen;

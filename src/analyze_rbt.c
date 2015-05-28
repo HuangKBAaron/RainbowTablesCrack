@@ -20,7 +20,7 @@ init_analyze_rbt(char *package) {
 
     init_ctx_from_package(&analyze_ctx, package);
     load_rainbow_tables(analyze_ctx.rbt_package, analyze_ctx.ntables, rbt_tables);
-    init_reduction(analyze_ctx.maxlen, analyze_ctx.charset);
+    init_reduction(1, analyze_ctx.maxlen, analyze_ctx.charset);
 
 #ifdef DEBUG
 
