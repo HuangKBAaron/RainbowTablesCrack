@@ -138,17 +138,17 @@ reduction_length(unsigned long long index){
 void
 index2plain_end_n_numbers(unsigned long long index, char *plain)
 {
+    unsigned int i, k;
     unsigned int rlength = reduction_length(index);
 
     unsigned long long ind = index;
 
-    unsigned int j;
     for( j = 0 ; j < rlength; j++ ){
         plain[j] = get_charset()->elements[ind%get_charset()->size];
         ind /= get_charset()->size;
     }
 
-    for(int k = 0 ; k < end_n_subcharset_n_parameter ; j++, k++) {
+    for(k = 0 ; k < end_n_subcharset_n_parameter ; j++, k++) {
         plain[j] = (char) ('0' + ind % end_n_subcharset_size_parameter);
         ind /= end_n_subcharset_size_parameter;
     }
