@@ -32,6 +32,20 @@ sudo make install clean
 
 ## Usage
 ```
-Usage: xrainbow_crack [--help] |
+Usage: xrainbow_crack -g
+                      -m MAX_PASSWORD_LENGTH
+                      -s [ u | l | n | s ]
+                      -c CHAIN_LENGTH
+                      -l TABLE_LENGTH
+                      -n TABLES_NUMBER
+
+       xrainbow_crack [ -f DIGEST_FILE | -b DIGEST ]
+                      -r PATH/TO/RAINBOW_TABLE_PACKAGE
+
+       xrainbow_crack -a PATH/TO/RAINBOW_TABLE_PACKAGE
+
+                      [ -t threads ]
+
+                      [--version]
 ```
 
