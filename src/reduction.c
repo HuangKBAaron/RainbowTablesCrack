@@ -3,18 +3,49 @@
 #include <openssl/sha.h>
 
 #include "reduction.h"
+
 #include "keyspace.h"
 #include "charset.h"
 
 
+typedef void (*functiontype)(unsigned long long, char *);
+
+functiontype index2plain_func;
+static unsigned int end_n_numbers_parameter = 0;
+
 
 static unsigned int reduction_length(unsigned long long index);
+static void index2plain_bruteforce(unsigned long long index, char *plain);
+static void index2plain_end_n_numbers(unsigned long long index, char *plain);
 
 
 
 void 
-init_reduction(unsigned int maxlen, unsigned int charset) {
-    init_keyspace(maxlen, charset);
+init_reduction(unsigned int mode, unsigned int maxlen, unsigned int charset) {
+    init_keyspace(mode, maxlen, charset);
+
+    switch (mode) {
+        case BRUTEFORCE_MODE:
+            index2plain_func = &index2plain_bruteforce;
+            break;
+        case END_TWO_NUMBERS_MODE:
+            index2plain_func = &index2plain_end_n_numbers;
+            end_n_numbers_parameter = 2;
+            break;
+        case END_FOUR_NUMBERS_MODE:
+            index2plain_func = &index2plain_end_n_numbers;
+            end_n_numbers_parameter = 4;
+            break;
+    }
+}
+
+
+
+/* transform a index into a plaintext */
+void
+index2plain(unsigned long long index, char *plain)
+{
+    index2plain_func(index, plain);
 }
 
 
@@ -50,8 +81,8 @@ sha2index(unsigned char *sha, unsigned int offset, unsigned int table)
 
 /* transform a index into a plaintext */
 void
-index2plain(unsigned long long index, char *plain)
-{	
+index2plain_bruteforce(unsigned long long index, char *plain)
+{
     unsigned int rlength = reduction_length(index);
 
     unsigned long long ind = index;
@@ -96,4 +127,31 @@ reduction_length(unsigned long long index){
             return i + 2;
     }
     return 1;
+}
+
+
+/* transform a index into a plaintext */
+void
+index2plain_end_n_numbers(unsigned long long index, char *plain)
+{
+    unsigned int rlength = reduction_length(index);
+
+    unsigned long long ind = index;
+
+    unsigned int j;
+    for( j = 0 ; j < rlength; j++ ){
+        plain[j] = get_charset()->elements[ind%get_charset()->size];
+        ind /= get_charset()->size;
+    }
+
+    char *end = malloc(end_n_numbers_parameter + 1);
+    sprintf(end, "%ull", ind);
+
+    for(int k = 0 ; k < end_n_numbers_parameter ; j++, k++) {
+        plain[j] = end[k];
+    }
+
+    plain[j] = '\0';
+
+    free(end);
 }
