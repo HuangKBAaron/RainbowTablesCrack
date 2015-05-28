@@ -138,7 +138,7 @@ reduction_length(unsigned long long index){
 void
 index2plain_end_n_numbers(unsigned long long index, char *plain)
 {
-    unsigned int i, k;
+    unsigned int j, k;
     unsigned int rlength = reduction_length(index);
 
     unsigned long long ind = index;
