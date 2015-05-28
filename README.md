@@ -17,9 +17,7 @@ sudo apt-get install libssl-dev
 ## Installation
 
 * Change to root directory.  
-```
-cd ui/
-```
+
 * Compile binary.  
 ```
 make
