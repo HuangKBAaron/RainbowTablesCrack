@@ -45,12 +45,12 @@ void
 init_generate_rbt(unsigned int maxlen, unsigned int charset, unsigned int chainlen, unsigned int tablelen, 
                   unsigned int ntables, unsigned int nthreads) {
 
-    if((sem = sem_open("semaphore1", O_CREAT, 0644, 1)) == SEM_FAILED) {
+    if((sem = sem_open("semaphore1", O_CREAT, 0644, 0)) == SEM_FAILED) {
         perror( "can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
 
-    if((sem2 = sem_open("semaphone2", O_CREAT, 0644, 1)) == SEM_FAILED) {
+    if((sem2 = sem_open("semaphone2", O_CREAT, 0644, 0)) == SEM_FAILED) {
         perror( "can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
