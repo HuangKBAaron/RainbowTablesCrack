@@ -28,10 +28,10 @@ static struct Shared shared;
 FILE *fp_digest;
 Mmp_Hash rbt_tables[MAX_TABLES];
 
-static sem_t  sem;
-static sem_t  sem2;
-static sem_t  sem3;
-static sem_t  sem4;
+static sem_t  *sem;
+static sem_t  *sem2;
+static sem_t  *sem3;
+static sem_t  *sem4;
 
 
 
@@ -45,19 +45,19 @@ static void *child(void *v);
 void
 init_break(char *package, unsigned int threads){
 
-    if(sem_init(&sem, 0, 1) == -1){
+    if((sem = sem_open("semaphore1", O_CREAT, 0644, 1)) == SEM_FAILED){
         perror( "can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
-    if(sem_init(&sem2, 0, 1) == -1){
+    if((sem2 = sem_open("semaphore2", O_CREAT, 0644, 1)) == SEM_FAILED){
         perror( "can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
-    if(sem_init(&sem3, 0, 1) == -1){
+    if((sem3 = sem_open("semaphore3", O_CREAT, 0644, 1)) == SEM_FAILED){
         perror( "can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
-    if(sem_init(&sem4, 0, 1) == -1){
+    if((sem4 = sem_open("semaphore4", O_CREAT, 0644, 1)) == SEM_FAILED){
         perror( "can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
@@ -172,14 +172,14 @@ lookup(unsigned char *searchedSha, int t){
             search_sha(searchedSha, i_index, i, t, plain_result);
             if(strcmp(plain_result, "") != 0){
 
-                sem_wait(&sem2);
+                sem_wait(sem2);
                 int i;
                 for(i=0 ; i < 20 ; i++){
                     printf("%02x", searchedSha[i]);
                 }
                 printf(" -> ");
                 printf("%s\n", plain_result);
-                sem_post(&sem2);
+                sem_post(sem2);
 
                 return plain_result;
             }
@@ -219,12 +219,12 @@ child(void *v)
     unsigned char sha[20];
 
     int j, i ;
-    sem_wait(&sem);
+    sem_wait(sem);
 
     for(i = 0 ; read(fp_digest, sha_text, sizeof(sha_text)) ; i++){
 
         shared.digest_ctr++;
-        sem_post(&sem);
+        sem_post(sem);
 
         string2sha(sha_text, sha);
 
@@ -232,26 +232,26 @@ child(void *v)
 
             plain = lookup(sha, j);
             if(plain != NULL){
-                sem_wait(&sem3);
+                sem_wait(sem3);
                 shared.crack_ctr++;
-                sem_post(&sem3);
+                sem_post(sem3);
 
                 break ;
             }
         }
         if(plain == NULL){
-            sem_wait(&sem2);
+            sem_wait(sem2);
             int i;
             for(i=0 ; i < 20 ; i++){
                 printf("%02x", sha[i]);
             }
             printf(" (not found)\n");
-            sem_post(&sem2);
+            sem_post(sem2);
         }
 
-        sem_wait(&sem);
+        sem_wait(sem);
     }
-    sem_post(&sem);
+    sem_post(sem);
 
     pthread_exit(0);
 }
@@ -269,21 +269,21 @@ break_digest(char *digest_str)
 
         plain = lookup(sha, j);
         if(plain != NULL){
-            sem_wait(&sem3);
+            sem_wait(sem3);
             shared.crack_ctr++;
-            sem_post(&sem3);
+            sem_post(sem3);
 
             return plain;
         }
     }
     if(plain == NULL){
-        sem_wait(&sem2);
+        sem_wait(sem2);
         int i;
         for(i=0 ; i < 20 ; i++){
             printf("%02x", sha[i]);
         }
         printf(" (not found)\n");
-        sem_post(&sem2);
+        sem_post(sem2);
     }
 
     return NULL;

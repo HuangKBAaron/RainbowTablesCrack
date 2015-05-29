@@ -30,8 +30,8 @@ struct Shared {
 struct Ctx generate_ctx;
 struct Shared shared;
 
-sem_t  sem;
-sem_t  sem2;
+sem_t  *sem;
+sem_t  *sem2;
 
 
 static void generate_table(unsigned int n_table);
@@ -45,12 +45,12 @@ void
 init_generate_rbt(unsigned int maxlen, unsigned int charset, unsigned int chainlen, unsigned int tablelen, 
                   unsigned int ntables, unsigned int nthreads) {
 
-    if(sem_init(&sem, 0, 1) == -1){
+    if((sem = sem_open("semaphore1", O_CREAT, 0644, 1)) == SEM_FAILED) {
         perror( "can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
 
-    if(sem_init(&sem2, 0, 1) == -1){
+    if((sem2 = sem_open("semaphone2", O_CREAT, 0644, 1)) == SEM_FAILED) {
         perror( "can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
@@ -118,18 +118,18 @@ child(void *v)
     unsigned int init_point;
     unsigned long long end_point;
 
-    sem_wait(&sem);
+    sem_wait(sem);
     while(shared.genchain_ctr < generate_ctx.tablelen){
-        sem_post(&sem);
+        sem_post(sem);
 
-        sem_wait(&sem2);
+        sem_wait(sem2);
         shared.index_ctr++;
         init_point = shared.index_ctr;
-        sem_post(&sem2);
+        sem_post(sem2);
 
         end_point = generate_chain(init_point, shared.current_table);
 
-        sem_wait(&sem);
+        sem_wait(sem);
         if(get(&(shared.hash_table), end_point)){
             shared.collision_ctr++;
         }else{
@@ -137,7 +137,7 @@ child(void *v)
             shared.genchain_ctr++;
         }
     }
-    sem_post(&sem);
+    sem_post(sem);
 
     pthread_exit(0);
 }
