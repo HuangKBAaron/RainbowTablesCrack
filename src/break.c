@@ -135,7 +135,7 @@ break_digest_file(char *digest_file){
 
     load_digest_file(digest_file);
     printf("digest file -> %s\n", digest_file);
-    printf("cracking passwords...\n");
+    printf("cracking passwords ...\n");
 
     pthread_t  *childs;
     childs = malloc(break_ctx.nthreads * sizeof(pthread_t));
@@ -256,14 +256,17 @@ child(void *v)
     char sha_text[41];
     unsigned char sha[20];
 
+    printf("point0\n");
+
     int j, i ;
 #ifdef __APPLE__
     sem_wait(sem);
 #else
     sem_wait(&sem);
 #endif
-    for(i = 0 ; read(fp_digest, sha_text, sizeof(sha_text)) ; i++){
-
+    printf("pointf1\n");
+    for(i = 0 ; read(fp_digest, sha_text, sizeof(sha_text)) ; i++) {
+        printf("pointf2\n");
         shared.digest_ctr++;
 #ifdef __APPLE__
         sem_post(sem);
@@ -279,11 +282,11 @@ child(void *v)
             if(plain != NULL){
 
 #ifdef __APPLE__
-                sem_wait(sem);
+                sem_wait(sem3);
                 shared.crack_ctr++;
                 sem_post(sem3);
 #else
-                sem_wait(&sem);
+                sem_wait(&sem3);
                 shared.crack_ctr++;
                 sem_post(&sem3);
 #endif
@@ -304,14 +307,18 @@ child(void *v)
             printf(" (not found)\n");
 #ifdef __APPLE__
             sem_post(sem2);
+            printf("point3.5\n");
 #else
             sem_post(&sem2);
 #endif
         }
+        printf("point4\n");
 
 #ifdef __APPLE__
         sem_wait(sem);
+        printf("point5");
     }
+    printf("point6\n");
     sem_post(sem);
 #else
         sem_wait(&sem);
@@ -319,6 +326,7 @@ child(void *v)
     sem_post(&sem);
 #endif
 
+    printf("pointf3\n");
     pthread_exit(0);
 }
 
