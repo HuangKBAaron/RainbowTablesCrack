@@ -28,12 +28,17 @@ static struct Shared shared;
 FILE *fp_digest;
 Mmp_Hash rbt_tables[MAX_TABLES];
 
+#ifdef __APPLE__
 static sem_t  *sem;
 static sem_t  *sem2;
 static sem_t  *sem3;
 static sem_t  *sem4;
-
-
+#else
+static sem_t  sem;
+static sem_t  sem2;
+static sem_t  sem3;
+static sem_t  sem4;
+#endif
 
 static void load_digest_file(char *file);
 static void search_sha(unsigned char *searchedSha, unsigned long initWord, unsigned int max_ite, int table, char *r);
@@ -44,6 +49,8 @@ static void *child(void *v);
 
 void
 init_break(char *package, unsigned int threads){
+
+#ifdef __APPLE__
 
     if((sem = sem_open("semaphore1", O_CREAT, 0644, 1)) == SEM_FAILED){
         perror( "can't init the semaphore" );
@@ -61,6 +68,27 @@ init_break(char *package, unsigned int threads){
         perror( "can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
+
+#else
+
+    if(sem_init(&sem, 0, 1) == -1){
+        perror( "can't init the semaphore" );
+        exit(EXIT_FAILURE);
+    }
+    if(sem_init(&sem2, 0, 1) == -1){
+        perror( "can't init the semaphore" );
+        exit(EXIT_FAILURE);
+    }
+    if(sem_init(&sem3, 0, 1) == -1){
+        perror( "can't init the semaphore" );
+        exit(EXIT_FAILURE);
+    }
+    if(sem_init(&sem4, 0, 1) == -1){
+        perror( "can't init the semaphore" );
+        exit(EXIT_FAILURE);
+    }
+
+#endif
 
     init_ctx_from_package(&break_ctx, package);
     break_ctx.nthreads = threads;
@@ -219,8 +247,11 @@ child(void *v)
     unsigned char sha[20];
 
     int j, i ;
+#ifdef __APPLE__
     sem_wait(sem);
-
+#else
+    sem_wait(&sem);
+#endif
     for(i = 0 ; read(fp_digest, sha_text, sizeof(sha_text)) ; i++){
 
         shared.digest_ctr++;
@@ -232,26 +263,47 @@ child(void *v)
 
             plain = lookup(sha, j);
             if(plain != NULL){
-                sem_wait(sem3);
+
+#ifdef __APPLE__
+                sem_wait(sem);
                 shared.crack_ctr++;
                 sem_post(sem3);
+#else
+                sem_wait(&sem);
+                shared.crack_ctr++;
+                sem_post(&sem3);
+#endif
 
                 break ;
             }
         }
         if(plain == NULL){
+#ifdef __APPLE__
             sem_wait(sem2);
+#else
+            sem_wait(&sem2);
+#endif
             int i;
             for(i=0 ; i < 20 ; i++){
                 printf("%02x", sha[i]);
             }
             printf(" (not found)\n");
+#ifdef __APPLE__
             sem_post(sem2);
+#else
+            sem_post(&sem2);
+#endif
         }
 
+#ifdef __APPLE__
         sem_wait(sem);
     }
     sem_post(sem);
+#else
+        sem_wait(&sem);
+    }
+    sem_post(&sem);
+#endif
 
     pthread_exit(0);
 }
@@ -269,24 +321,35 @@ break_digest(char *digest_str)
 
         plain = lookup(sha, j);
         if(plain != NULL){
+#ifdef __APPLE__
             sem_wait(sem3);
             shared.crack_ctr++;
             sem_post(sem3);
-
+#else
+            sem_wait(&sem3);
+            shared.crack_ctr++;
+            sem_post(&sem3);
+#endif
             return plain;
         }
     }
     if(plain == NULL){
+#ifdef __APPLE__
         sem_wait(sem2);
+#else
+        sem_wait(&sem2);
+#endif
         int i;
         for(i=0 ; i < 20 ; i++){
             printf("%02x", sha[i]);
         }
         printf(" (not found)\n");
+#ifdef __APPLE__
         sem_post(sem2);
+#else
+        sem_post(&sem2);
+#endif
     }
 
     return NULL;
-
-    //pthread_exit(0);
 }

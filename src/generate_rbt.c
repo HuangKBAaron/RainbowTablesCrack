@@ -30,9 +30,13 @@ struct Shared {
 struct Ctx generate_ctx;
 struct Shared shared;
 
+#ifdef __APPLE__
 sem_t  *sem;
 sem_t  *sem2;
-
+#else
+sem_t  sem;
+sem_t  sem2;
+#endif
 
 static void generate_table(unsigned int n_table);
 static unsigned long long generate_chain(unsigned int init_point, unsigned int table);
@@ -45,15 +49,27 @@ void
 init_generate_rbt(unsigned int maxlen, unsigned int charset, unsigned int chainlen, unsigned int tablelen, 
                   unsigned int ntables, unsigned int nthreads) {
 
-    if((sem = sem_open("semaphore1", O_CREAT, 0644, 0)) == SEM_FAILED) {
+#ifdef __APPLE__
+    if((sem = sem_open("semaphore1", O_CREAT, 0644, 1)) == SEM_FAILED) {
         perror( "can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
 
-    if((sem2 = sem_open("semaphone2", O_CREAT, 0644, 0)) == SEM_FAILED) {
+    if((sem2 = sem_open("semaphone2", O_CREAT, 0644, 1)) == SEM_FAILED) {
         perror( "can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
+#else
+    if(sem_init(&sem, 0, 1) == -1){
+        perror( "can't init the semaphore" );
+        exit(EXIT_FAILURE);
+    }
+
+    if(sem_init(&sem2, 0, 1) == -1){
+        perror( "can't init the semaphore" );
+        exit(EXIT_FAILURE);
+    }
+#endif
 
     shared.collision_ctr = 0;
     shared.index_ctr = 0;
@@ -118,8 +134,13 @@ child(void *v)
     unsigned int init_point;
     unsigned long long end_point;
 
+#ifdef __APPLE__
     sem_wait(sem);
+#else
+    sem_wait(&sem);
+#endif
     while(shared.genchain_ctr < generate_ctx.tablelen){
+#ifdef __APPLE__
         sem_post(sem);
 
         sem_wait(sem2);
@@ -138,6 +159,26 @@ child(void *v)
         }
     }
     sem_post(sem);
+#else
+        sem_post(&sem);
+        sem_wait(&sem2);
+
+        shared.index_ctr++;
+        init_point = shared.index_ctr;
+        sem_post(&sem2);
+
+        end_point = generate_chain(init_point, shared.current_table);
+
+        sem_wait(&sem);
+        if(get(&(shared.hash_table), end_point)){
+            shared.collision_ctr++;
+        }else{
+            put(&(shared.hash_table), end_point, init_point);
+            shared.genchain_ctr++;
+        }
+    }
+    sem_post(&sem);
+#endif
 
     pthread_exit(0);
 }
