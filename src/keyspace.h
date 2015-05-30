@@ -1,6 +1,7 @@
 #define BRUTEFORCE_MODE 1
 #define END_TWO_NUMBERS_MODE 2
 #define END_FOUR_NUMBERS_MODE 4
+#define BEGIN_ONE_UPPERCASE_MODE 5
 
 
 void init_keyspace(unsigned int mode, unsigned int maxlen, unsigned int charset);

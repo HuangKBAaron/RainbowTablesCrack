@@ -9,6 +9,10 @@
 #define SPECIALCHARS 8
 
 
+#define NUMBERIC_CHARSET_LENGTH 10
+#define UPPERCASE_CHARSET_LENGTH 26
+#define LOWERCASE_CHARSET_LENGTH 26
+
 
 enum {CHARSET_MAX = 100};       /* Maximum charset cardinality. */
 

@@ -14,12 +14,12 @@ static unsigned long long subspaces[MAX_MKEY_LENGTH]; // array of index of sizes
 static unsigned int max_key_length;
 
 
-static void init_end_n_subcharset_keyspace(unsigned int maxlen, unsigned int charset, unsigned int n, unsigned int size);
+static void init_two_charsets_keyspace(unsigned int maxlen, unsigned int charset, unsigned int n, unsigned int size);
 
 
 
 
-static void init_end_n_subcharset_keyspace(unsigned int maxlen, unsigned int charset, unsigned int n, unsigned int size){
+static void init_two_charsets_keyspace(unsigned int maxlen, unsigned int charset, unsigned int n, unsigned int size){
 
     init_charset(charset);
 
@@ -33,18 +33,21 @@ static void init_end_n_subcharset_keyspace(unsigned int maxlen, unsigned int cha
     max_key_length = maxlen;
 }
 
+
 void init_keyspace(unsigned int mode, unsigned int maxlen, unsigned int charset){
 
     switch (mode) {
         case BRUTEFORCE_MODE:
-            init_end_n_subcharset_keyspace(maxlen, charset, 1, 1);
+            init_two_charsets_keyspace(maxlen, charset, 1, 1);
             break;
         case END_TWO_NUMBERS_MODE:
-            init_end_n_subcharset_keyspace(maxlen, charset, 2, 10);
+            init_two_charsets_keyspace(maxlen, charset, 2, NUMBERIC_CHARSET_LENGTH);
             break;
         case END_FOUR_NUMBERS_MODE:
-            init_end_n_subcharset_keyspace(maxlen, charset, 4, 10);
+            init_two_charsets_keyspace(maxlen, charset, 4, NUMBERIC_CHARSET_LENGTH);
             break;
+        case BEGIN_ONE_UPPERCASE_MODE:
+            init_two_charsets_keyspace(maxlen, charset, 1, UPPERCASE_CHARSET_LENGTH);
     }
 }
 
