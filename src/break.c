@@ -200,6 +200,7 @@ lookup(unsigned char *searchedSha, int t){
             search_sha(searchedSha, i_index, i, t, plain_result);
             if(strcmp(plain_result, "") != 0){
 
+#ifdef __APPLE__
                 sem_wait(sem2);
                 int i;
                 for(i=0 ; i < 20 ; i++){
@@ -208,7 +209,16 @@ lookup(unsigned char *searchedSha, int t){
                 printf(" -> ");
                 printf("%s\n", plain_result);
                 sem_post(sem2);
-
+#else
+                sem_wait(&sem2);
+                int i;
+                for(i=0 ; i < 20 ; i++){
+                    printf("%02x", searchedSha[i]);
+                }
+                printf(" -> ");
+                printf("%s\n", plain_result);
+                sem_post(&sem2);
+#endif
                 return plain_result;
             }
         }
@@ -255,7 +265,11 @@ child(void *v)
     for(i = 0 ; read(fp_digest, sha_text, sizeof(sha_text)) ; i++){
 
         shared.digest_ctr++;
+#ifdef __APPLE__
         sem_post(sem);
+#else
+        sem_post(&sem);
+#endif
 
         string2sha(sha_text, sha);
 
