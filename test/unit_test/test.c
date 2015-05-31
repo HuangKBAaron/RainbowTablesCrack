@@ -84,10 +84,10 @@ void test_break() {
 
 
 void test_reduction() {
-    init_reduction(5, 5, 2);
+    init_reduction(1, 5, 2);
 
     char plain[15];
-    index2plain(34, plain);
+    index2plain(543, plain);
 
     printf("plain: %s\n", plain);
 }

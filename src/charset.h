@@ -13,6 +13,11 @@
 #define UPPERCASE_CHARSET_LENGTH 26
 #define LOWERCASE_CHARSET_LENGTH 26
 
+#define UPPERCASE_FIRST_POINT 'A'
+#define LOWERCASE_FIRST_POINT 'a'
+#define NUMBERS_FIRST_POINT '0'
+
+
 
 enum {CHARSET_MAX = 100};       /* Maximum charset cardinality. */
 
