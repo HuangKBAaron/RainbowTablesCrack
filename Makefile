@@ -13,9 +13,9 @@ OBJECTS := $(patsubst %.$(SRCEXT),%.$(BUILDEXT),$(SOURCES))
 TARGET := xrainbow_crack
 INSTALL_PATH := /usr/bin/
 
-CFLAGS += -g -Wall -DDEBUG -I$(LIB_DIR) -I$(SRC_DIR)
+#CFLAGS += -g -Wall -DDEBUG -I$(LIB_DIR) -I$(SRC_DIR)
+CFLAGS += -g -Wall -I$(LIB_DIR) -I$(SRC_DIR)
 LDFLAGS += -lm -lcrypto -pthread
-#LDFLAGS += -lm -lcrypto -pthread
 
 
 all: ${TARGET}

@@ -65,7 +65,7 @@ void itoa(int n, char *s);
 void init_ctx_from_package(struct Ctx *ctx, char *package);
 char *get_feat_from_package(char *package);
 
-char *name_rbt_package(unsigned int maxlen, unsigned int charset, unsigned int chainlen, unsigned int ntables);
+char *name_rbt_package(unsigned int maxlen, unsigned int charset, unsigned int mode, unsigned int chainlen, unsigned int ntables);
 char *name_rbt_n(char *package, unsigned int table);
 
 void string2sha(char *str, unsigned char *sha);

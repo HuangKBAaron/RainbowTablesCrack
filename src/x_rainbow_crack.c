@@ -26,7 +26,7 @@ int main (int argc, char *argv[]) {
     int vflag = 0;
     int hflag = 0;
     int gflag = 0;
-    char *mvalue = NULL;
+    char *Mvalue = NULL;
     char *svalue = NULL;
     char *mvalue = NULL;
     char *cvalue = NULL;
@@ -53,7 +53,7 @@ int main (int argc, char *argv[]) {
                     {"version",      no_argument,       0, 'v'},
                     {"help",         no_argument,       0, 'h'},
                     {"generate",     no_argument,       0, 'g'},
-                    {"maxlen",       required_argument, 0, 'm'},
+                    {"maxlen",       required_argument, 0, 'M'},
                     {"charset",      required_argument, 0, 's'},
                     {"mode",         required_argument, 0, 'm'},
                     {"chainlen",     required_argument, 0, 'c'},
@@ -66,7 +66,7 @@ int main (int argc, char *argv[]) {
                     {0,              0,                 0, 0}
             };
 
-    while ((opt = getopt_long(argc, argv, ":vhgm:s:c:l:n:r:f:t:a:", long_options, &option_index)) != -1) {
+    while ((opt = getopt_long(argc, argv, ":vhgM:s:m:c:l:n:r:f:t:a:", long_options, &option_index)) != -1) {
 
         switch (opt) {
 
@@ -82,8 +82,8 @@ int main (int argc, char *argv[]) {
                 gflag = 1;
                 break;
 
-            case 'm':
-                mvalue = optarg;
+            case 'M':
+                Mvalue = optarg;
                 break;
 
             case 's':
@@ -156,7 +156,7 @@ int main (int argc, char *argv[]) {
         nthreads = DEFAULT_THREADS;
     }
 
-    maxlen = clean_int(mvalue);
+    maxlen = clean_int(Mvalue);
     charset = clean_charset(svalue);
     mode = clean_int(mvalue);
     chainlen = clean_int(cvalue);
