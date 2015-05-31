@@ -94,7 +94,7 @@ int mkdir_recursive(const char *dir, mode_t mode) {
 }
 
 char * 
-name_rbt_package(unsigned int maxlen, unsigned int charset, unsigned int chainlen, unsigned int ntables){
+name_rbt_package(unsigned int maxlen, unsigned int charset, unsigned int mode, unsigned int chainlen, unsigned int ntables) {
 
     char *toReturn = NULL;
     struct passwd *pw;
@@ -115,8 +115,8 @@ name_rbt_package(unsigned int maxlen, unsigned int charset, unsigned int chainle
 
 #else
 
-    sprintf(toReturn, "%s/%s/%s_%u_%u_%u_%u_%ld/", homedir, XRAINBOW_CRACK_APP_DATA, RBT_NAME, maxlen, charset, chainlen,
-            ntables, seconds);
+    sprintf(toReturn, "%s/%s/%s_%u_%u_%u_%u_%u_%ld/", homedir, XRAINBOW_CRACK_APP_DATA, RBT_NAME, maxlen, charset, mode,
+            chainlen, ntables, seconds);
 
 #endif
 
@@ -253,16 +253,19 @@ init_ctx_from_package(struct Ctx *ctx, char *package) {
 
     char *maxlen_str = get_config(2, MAXLEN_CONFIG_PARAM_NAME, filename);
     char *charset_str = get_config(2, CHARSET_CONFIG_PARAM_NAME, filename);
+    char *mode_str = get_config(2, MODE_CONFIG_PARAM_NAME, filename);
     char *chainlen_str = get_config(15, CHAINLEN_CONFIG_PARAM_NAME, filename);
     char *ntables_str = get_config(2, NTABLES_CONFIG_PARAM_NAME, filename);
 
     unsigned int max_len = clean_int(maxlen_str);
     unsigned int char_set = clean_charset(charset_str);
+    unsigned int mode = clean_charset(mode_str);
     unsigned int chain_len = clean_int(chainlen_str);
     unsigned int n_tables = clean_int(ntables_str);
 
     ctx -> maxlen = max_len;
     ctx -> charset = char_set;
+    ctx -> mode = mode;
     ctx -> chainlen = chain_len;
     ctx -> ntables = n_tables;
     ctx -> rbt_package = package;

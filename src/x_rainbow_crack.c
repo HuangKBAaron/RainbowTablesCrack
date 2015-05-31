@@ -28,6 +28,7 @@ int main (int argc, char *argv[]) {
     int gflag = 0;
     char *mvalue = NULL;
     char *svalue = NULL;
+    char *mvalue = NULL;
     char *cvalue = NULL;
     char *lvalue = NULL;
     char *nvalue = NULL;
@@ -37,6 +38,7 @@ int main (int argc, char *argv[]) {
     char *tvalue = NULL;
     unsigned int maxlen = 0;
     unsigned int charset = 0;
+    unsigned int mode = 0;
     unsigned int chainlen = 0;
     unsigned int tablelen = 0;
     unsigned int ntables = 0;
@@ -53,6 +55,7 @@ int main (int argc, char *argv[]) {
                     {"generate",     no_argument,       0, 'g'},
                     {"maxlen",       required_argument, 0, 'm'},
                     {"charset",      required_argument, 0, 's'},
+                    {"mode",         required_argument, 0, 'm'},
                     {"chainlen",     required_argument, 0, 'c'},
                     {"tablelen",     required_argument, 0, 'l'},
                     {"tables",       required_argument, 0, 'n'},
@@ -85,6 +88,10 @@ int main (int argc, char *argv[]) {
 
             case 's':
                 svalue = optarg;
+                break;
+
+            case 'm':
+                mvalue = optarg;
                 break;
 
             case 'c':
@@ -151,6 +158,7 @@ int main (int argc, char *argv[]) {
 
     maxlen = clean_int(mvalue);
     charset = clean_charset(svalue);
+    mode = clean_int(mvalue);
     chainlen = clean_int(cvalue);
     tablelen = clean_int(lvalue);
     ntables = clean_int(nvalue);
@@ -158,6 +166,10 @@ int main (int argc, char *argv[]) {
 
     if (nthreads <= 0) {
         nthreads = DEFAULT_THREADS;
+    }
+
+    if (mode <= 0) {
+        mode = DEFAULT_MODE;
     }
 
     if (gflag && maxlen > 0 && charset > 0 && chainlen > 0 && tablelen > 0 && ntables > 0) {
@@ -169,7 +181,7 @@ int main (int argc, char *argv[]) {
 
 #endif
 
-        init_generate_rbt(maxlen, charset, chainlen, tablelen, ntables, nthreads);
+        init_generate_rbt(maxlen, charset, mode, chainlen, tablelen, ntables, nthreads);
         generate_rbt();
     } else if (rvalue != NULL && fvalue != NULL) {
 

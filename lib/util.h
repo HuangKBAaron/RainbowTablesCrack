@@ -41,6 +41,7 @@
 
 #define MAXLEN_CONFIG_PARAM_NAME "maxlen"
 #define CHARSET_CONFIG_PARAM_NAME "charset"
+#define MODE_CONFIG_PARAM_NAME "mode"
 #define CHAINLEN_CONFIG_PARAM_NAME "chainlen"
 #define NTABLES_CONFIG_PARAM_NAME "ntables"
 
@@ -49,6 +50,7 @@
 struct Ctx {
     unsigned int maxlen;
     unsigned int charset;
+    unsigned int mode;
     unsigned int chainlen;
     unsigned int tablelen;
     unsigned int ntables;

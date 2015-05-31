@@ -46,8 +46,8 @@ static void *child(void *v);
 
 
 void 
-init_generate_rbt(unsigned int maxlen, unsigned int charset, unsigned int chainlen, unsigned int tablelen, 
-                  unsigned int ntables, unsigned int nthreads) {
+init_generate_rbt(unsigned int maxlen, unsigned int charset, unsigned int mode, unsigned int chainlen,
+                  unsigned int tablelen, unsigned int ntables, unsigned int nthreads) {
 
 #ifdef __APPLE__
     if((sem = sem_open("semaphore1", O_CREAT, 0644, 1)) == SEM_FAILED) {
@@ -61,12 +61,12 @@ init_generate_rbt(unsigned int maxlen, unsigned int charset, unsigned int chainl
     }
 #else
     if(sem_init(&sem, 0, 1) == -1){
-        perror( "can't init the semaphore" );
+        perror( "Can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
 
     if(sem_init(&sem2, 0, 1) == -1){
-        perror( "can't init the semaphore" );
+        perror( "Can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
 #endif
@@ -74,14 +74,14 @@ init_generate_rbt(unsigned int maxlen, unsigned int charset, unsigned int chainl
     shared.collision_ctr = 0;
     shared.index_ctr = 0;
 
-    init_reduction(1, maxlen, charset);
+    init_reduction(mode, maxlen, charset);
 
     generate_ctx.maxlen = maxlen;
     generate_ctx.tablelen = tablelen;
     generate_ctx.chainlen = chainlen;
     generate_ctx.ntables = ntables;
     generate_ctx.nthreads = nthreads;
-    generate_ctx.rbt_package = name_rbt_package(maxlen, charset, chainlen, ntables);
+    generate_ctx.rbt_package = name_rbt_package(maxlen, charset, mode, chainlen, ntables);
 
     if(mkdir_recursive(generate_ctx.rbt_package, S_IRWXU) != 0) {
         printf("Cant't make Rainbow Table Package\n");
@@ -98,6 +98,7 @@ init_generate_rbt(unsigned int maxlen, unsigned int charset, unsigned int chainl
     FILE *fd = fopen(filename, "w+");
     fprintf(fd, "%s = %u\n", MAXLEN_CONFIG_PARAM_NAME, maxlen);
     fprintf(fd, "%s = %u\n", CHARSET_CONFIG_PARAM_NAME, charset);
+    fprintf(fd, "%s = %u\n", MODE_CONFIG_PARAM_NAME, mode);
     fprintf(fd, "%s = %u\n", CHAINLEN_CONFIG_PARAM_NAME, chainlen);
     fprintf(fd, "%s = %u\n", NTABLES_CONFIG_PARAM_NAME, ntables);
     fclose(fd);

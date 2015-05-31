@@ -9,6 +9,7 @@
 #define X_RAINBOW_CRACK_USAGE "Usage: xrainbow_crack -g\n"\
                               "                      -m MAX_PASSWORD_LENGTH\n"\
                               "                      -s [ u | l | n | s ]\n"\
+                              "                      -m MODE\n"\
                               "                      -c CHAIN_LENGTH\n"\
                               "                      -l TABLE_LENGTH\n"\
                               "                      -n TABLES_NUMBER\n"\
@@ -23,6 +24,7 @@
                               "                      [--version]\n"
 
 #define DEFAULT_THREADS 8
+#define DEFAULT_MODE 1
 
 #define NUMERIC_CHARSET_CODE 'n'
 #define LOWERALPHA_CHARSET_CODE 'l'

@@ -53,38 +53,38 @@ init_break(char *package, unsigned int threads){
 #ifdef __APPLE__
 
     if((sem = sem_open("semaphore1", O_CREAT, 0644, 1)) == SEM_FAILED){
-        perror( "can't init the semaphore" );
+        perror( "Can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
     if((sem2 = sem_open("semaphore2", O_CREAT, 0644, 1)) == SEM_FAILED){
-        perror( "can't init the semaphore" );
+        perror( "Can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
     if((sem3 = sem_open("semaphore3", O_CREAT, 0644, 1)) == SEM_FAILED){
-        perror( "can't init the semaphore" );
+        perror( "Can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
     if((sem4 = sem_open("semaphore4", O_CREAT, 0644, 1)) == SEM_FAILED){
-        perror( "can't init the semaphore" );
+        perror( "Can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
 
 #else
 
     if(sem_init(&sem, 0, 1) == -1){
-        perror( "can't init the semaphore" );
+        perror( "Can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
     if(sem_init(&sem2, 0, 1) == -1){
-        perror( "can't init the semaphore" );
+        perror( "Can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
     if(sem_init(&sem3, 0, 1) == -1){
-        perror( "can't init the semaphore" );
+        perror( "Can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
     if(sem_init(&sem4, 0, 1) == -1){
-        perror( "can't init the semaphore" );
+        perror( "Can't init the semaphore" );
         exit(EXIT_FAILURE);
     }
 
@@ -94,13 +94,13 @@ init_break(char *package, unsigned int threads){
     break_ctx.nthreads = threads;
 
     load_rainbow_tables(package, break_ctx.ntables, rbt_tables);
-    init_reduction(1, break_ctx.maxlen, break_ctx.charset);
+    init_reduction(break_ctx.mode, break_ctx.maxlen, break_ctx.charset);
 
     shared.digest_ctr = 0;
     shared.crack_ctr = 0;
 
     printf("\n");
-    printf("loading rainbow tables...\n");
+    printf("Loading rainbow tables ...\n");
     printf("RTB package: %s\n", package);
     printf("\n");
 }
@@ -135,7 +135,7 @@ break_digest_file(char *digest_file){
 
     load_digest_file(digest_file);
     printf("digest file -> %s\n", digest_file);
-    printf("cracking passwords ...\n");
+    printf("Looking for passwords ...\n");
 
     pthread_t  *childs;
     childs = malloc(break_ctx.nthreads * sizeof(pthread_t));
@@ -256,17 +256,13 @@ child(void *v)
     char sha_text[41];
     unsigned char sha[20];
 
-    printf("point0\n");
-
     int j, i ;
 #ifdef __APPLE__
     sem_wait(sem);
 #else
     sem_wait(&sem);
 #endif
-    printf("pointf1\n");
     for(i = 0 ; read(fp_digest, sha_text, sizeof(sha_text)) ; i++) {
-        printf("pointf2\n");
         shared.digest_ctr++;
 #ifdef __APPLE__
         sem_post(sem);
@@ -307,18 +303,14 @@ child(void *v)
             printf(" (not found)\n");
 #ifdef __APPLE__
             sem_post(sem2);
-            printf("point3.5\n");
 #else
             sem_post(&sem2);
 #endif
         }
-        printf("point4\n");
 
 #ifdef __APPLE__
         sem_wait(sem);
-        printf("point5");
     }
-    printf("point6\n");
     sem_post(sem);
 #else
         sem_wait(&sem);
@@ -326,7 +318,6 @@ child(void *v)
     sem_post(&sem);
 #endif
 
-    printf("pointf3\n");
     pthread_exit(0);
 }
 
