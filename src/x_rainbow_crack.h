@@ -8,8 +8,7 @@
 
 #define X_RAINBOW_CRACK_USAGE "Usage: xrainbow_crack -g\n"\
                               "                      -M MAX_PASSWORD_LENGTH\n"\
-                              "                      -s [ u | l | n | s ]\n"\
-                              "                      -m MODE\n"\
+                              "                      -s u|l|n|s [ -m MODE ]\n"\
                               "                      -c CHAIN_LENGTH\n"\
                               "                      -l TABLE_LENGTH\n"\
                               "                      -n TABLES_NUMBER\n"\
