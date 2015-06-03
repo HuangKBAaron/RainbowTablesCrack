@@ -68,6 +68,9 @@ void init_keyspace(unsigned int mode, unsigned int maxlen, unsigned int charset)
         case COMBO_BEGIN_ONE_UPPERCASE_END_TWO_NUMBERS_MODE:
             init_three_charsets_keyspace(maxlen, charset, 1, UPPERCASE_CHARSET_LENGTH, 2, NUMBERIC_CHARSET_LENGTH);
             break;
+        case COMBO_BEGIN_ONE_UPPERCASE_END_FOUR_NUMBERS_MODE:
+            init_three_charsets_keyspace(maxlen, charset, 1, UPPERCASE_CHARSET_LENGTH, 4, NUMBERIC_CHARSET_LENGTH);
+            break;
     }
 }
 

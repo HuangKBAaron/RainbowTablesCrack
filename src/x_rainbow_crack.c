@@ -55,7 +55,7 @@ int main (int argc, char *argv[]) {
                     {"generate",     no_argument,       0, 'g'},
                     {"maxlen",       required_argument, 0, 'M'},
                     {"charset",      required_argument, 0, 's'},
-                    {"mode",         required_argument, 0, 'm'},
+                    {"mask",         required_argument, 0, 'm'},
                     {"chainlen",     required_argument, 0, 'c'},
                     {"tablelen",     required_argument, 0, 'l'},
                     {"tables",       required_argument, 0, 'n'},

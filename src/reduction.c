@@ -59,6 +59,16 @@ init_reduction(unsigned int mode, unsigned int maxlen, unsigned int charset) {
             end_n_subcharset_size_parameter = NUMBERIC_CHARSET_LENGTH;
             end_n_subcharset_first_point_parameter = NUMBERS_FIRST_POINT;
             break;
+        case COMBO_BEGIN_ONE_UPPERCASE_END_FOUR_NUMBERS_MODE:
+            index2plain_func = &index2plain_combo_begin_end_n_elements;
+            begin_n_subcharset_n_parameter = 1;
+            begin_n_subcharset_size_parameter = UPPERCASE_CHARSET_LENGTH;
+            begin_n_subcharset_first_point_parameter = UPPERCASE_FIRST_POINT;
+            end_n_subcharset_n_parameter = 4;
+            end_n_subcharset_size_parameter = NUMBERIC_CHARSET_LENGTH;
+            end_n_subcharset_first_point_parameter = NUMBERS_FIRST_POINT;
+            break;
+
     }
 }
 
