@@ -31,8 +31,8 @@ sudo make install clean
 ## Usage
 ```
 Usage: xrainbow_crack -g
-                      -m MAX_PASSWORD_LENGTH
-                      -s [ u | l | n | s ]
+                      -M MAX_PASSWORD_LENGTH
+                      -s u|l|n|s [ -m MASK ]
                       -c CHAIN_LENGTH
                       -l TABLE_LENGTH
                       -n TABLES_NUMBER
