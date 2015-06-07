@@ -10,10 +10,10 @@ Rainbow tables generator and sha1 digests crack.
 ## More features
 * Generate random passwords or masked passwords.
 * Multi-threading. 
-* Generate masked passwords.
 * Tested on MacOSX Yosemite and Ubuntu 14.04.
 
-## Prerrequisites
+## Install X Rainbow Crack
+### Prerrequisites
 
 * GCC compiler and make.  
 ```
@@ -25,7 +25,9 @@ sudo apt-get install gcc make
 sudo apt-get install libssl-dev
 ```
 
-## Installation
+### Installation
+
+* Download .zip package and unzip it.
 
 * Change to root directory.  
 
