@@ -61,7 +61,7 @@ Usage: xrainbow_crack -g
 ```
 ### Generate Rainbow Tables
 ```
-xrainbow_crack -g -M MAX_PASSWORD_LENGTH -s l -m MASK -c CHAIN_LENGTH -l TABLE_LENGTH -n TABLES_NUMBER
+xrainbow_crack -g -M MAX_PASSWORD_LENGTH -s u|l|n|s -m MASK_VALUE -c CHAIN_LENGTH -l TABLE_LENGTH -n TABLES_NUMBER
 ```
 Where:
 - MAX_PASSWORD_LENGTH: maximum length of generated passwords.
@@ -73,3 +73,18 @@ Where:
 - CHAIN_LENGTH: length of chain.
 - TABLE_LENGTH: length of each Rainbow Table.
 - TABLES_NUMBER: number of Rainbow Tables.
+
+### Analyze Rainbow Tables
+```
+xrainbow_crack -a PATH/TO/RAINBOW_TABLE_PACKAGE
+```
+Where:
+- PATH/TO/RAINBOW_TABLE_PACKAGE: path to Rainbow Tables Package to analyze.
+
+### Analyze Rainbow Tables
+```
+xrainbow_crack -f DIGEST_FILE -r PATH/TO/RAINBOW_TABLE_PACKAGE
+```
+Where:
+- PATH/TO/RAINBOW_TABLE_PACKAGE: path to Rainbow Tables Package to use.
+- DIGEST_FILE: file with all sha1 digests that we want to crack (one per line).
