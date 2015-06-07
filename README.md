@@ -1,6 +1,17 @@
-#Rainbow Tables Crack (TFM version)
+#X Rainbow Crack
 
-Rainbow tables generator and sha1 crack.
+Rainbow tables generator and sha1 digests crack.
+
+## Main features
+* Analyze passwords contained in Rainbow Tables.
+* Generate parameterized Rainbow Tables.
+* Use generated Rainbow Tables to crack sha1 digests.
+
+## More features
+* Generate random passwords or masked passwords.
+* Multi-threading. 
+* Generate masked passwords.
+* Tested on MacOSX Yosemite and Ubuntu 14.04.
 
 ## Prerrequisites
 
