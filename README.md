@@ -81,7 +81,7 @@ xrainbow_crack -a PATH/TO/RAINBOW_TABLE_PACKAGE
 Where:
 - PATH/TO/RAINBOW_TABLE_PACKAGE: path to Rainbow Tables Package to analyze.
 
-### Analyze Rainbow Tables
+### Crack sha1 digests
 ```
 xrainbow_crack -f DIGEST_FILE -r PATH/TO/RAINBOW_TABLE_PACKAGE
 ```
